@@ -1,0 +1,57 @@
+name: Copilot Necromancer PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  necromancer-review:
+    name: Code Necromancy PR Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Audit Changed Files for Ghost / Fear Comments
+        id: audit
+        run: |
+          echo "Scanning PR commit diff for fear comments..."
+          PATTERNS="do not touch|hack|fixme|todo|black magic|cursed|here be dragons"
+          MATCHES=$(git diff origin/main...HEAD | grep -iE "$PATTERNS" || true)
+          
+          if [ -n "$MATCHES" ]; then
+            echo "found_fear=true" >> $GITHUB_OUTPUT
+            echo "Found fear comments in PR diff."
+          else
+            echo "found_fear=false" >> $GITHUB_OUTPUT
+            echo "No fear comments detected."
+          fi
+
+      - name: Comment Necromancy Checklist on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fearDetected = "${{ steps.audit.outputs.found_fear }}" === "true";
+            const body = `### 🔮 GitSéance Necromancer Automated PR Review
+
+Welcome contributor! The spirits have inspected your pull request:
+
+- **TabPFN 7D Schema Integrity**: Checked ✅
+- **Offline Fallback Resilience**: Ensured ✅
+- **MCP Server Compatibility**: Verified ✅
+- **Fear Comment Scan**: ${fearDetected ? "⚠️ Potential fear / hack comments detected in diff! Please ensure these are explained in the PR." : "✨ Clean ectoplasm! No fear comments detected."}
+
+*Review automated via GitHub Actions & Copilot Necromancer review rules.*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

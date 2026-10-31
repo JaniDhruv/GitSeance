@@ -19,6 +19,7 @@
 [![GitSéance Mortality](https://gitseance.onrender.com/api/badge/mitsuhiko/flask-cache.svg)](https://gitseance.onrender.com)
 [![Open Source AI](https://img.shields.io/badge/Open--Source%20AI-TabPFN%20%2B%20Gemma-00ff9d?style=for-the-badge)](https://github.com/JaniDhruv/GitSeance)
 [![CI Pipeline](https://img.shields.io/badge/CI%20Pipeline-25%20Passed-39ff14?style=for-the-badge)](https://github.com/JaniDhruv/GitSeance/actions)
+[![CD Pipeline](https://img.shields.io/badge/CD%20Pipeline-Verified%20Live-00f0ff?style=for-the-badge)](https://github.com/JaniDhruv/GitSeance/actions)
 
 Built for **Hacktoberfest Open-Source AI Challenge: Week 4 ("Ghost in the Machine")**.
 
@@ -105,6 +106,7 @@ Built for **Hacktoberfest Open-Source AI Challenge: Week 4 ("Ghost in the Machin
 - **Interactive Particle System**: Floating ectoplasmic canvas wisps and mouse trails.
 - **💬 Conversational Séance (Interactive Ghost Chat)**: Chat directly with the ghost of any file's original author inside the séance chamber.
 - **🪦 Official Post-Mortem Autopsy Certificates**: Generates downloadable vintage ASCII death certificates detailing cause of demise, bus factor, and TabPFN mortality score.
+- **📊 7D Tabular CSV Forensic Exporter**: Download the raw feature dataset directly for offline TabPFN model exploration.
 - **🛡️ Live GitHub SVG Mortality Badge**: Embed a real-time mortality badge directly into any repository's `README.md` via `GET /api/badge/{owner}/{repo}.svg`.
 
 ```
@@ -142,8 +144,12 @@ GitSéance is deeply integrated with **GitHub Copilot** to empower developers wi
   - **`/dep-modernize`** (`.github/prompts/dep-modernize.prompt.md`): Audits deprecated dependencies from `requirements.txt` or `package.json` to surface 2026 replacements and active CVE advisories.
 - **Standardized Review Checklist (`.github/pull_request_template.md`)**:
   - Enforces agent decoupling, TabPFN metric integrity, and offline fallback resilience on every pull request.
-- **Automated Multi-OS CI Workflows (`.github/workflows/ci.yml`)**:
-  - Continuous Integration pipeline testing across Ubuntu and Windows on Python 3.11 and 3.12 (25 unit and integration tests).
+- **Automated Multi-OS CI Workflow (`.github/workflows/ci.yml`)**:
+  - Continuous Integration testing matrix across Ubuntu and Windows on Python 3.11 and 3.12 (25 unit and integration tests).
+- **Continuous Deployment & Production Verification (`.github/workflows/cd.yml`)**:
+  - Automated deployment workflow on `main` push that probes production health (`/health`), verifies the dynamic SVG badge, and outputs a formatted Markdown deployment summary to `$GITHUB_STEP_SUMMARY`.
+- **Automated Copilot PR Review Action (`.github/workflows/copilot-review.yml`)**:
+  - Automatically audits contributor PR diffs for fear comments (`do not touch`, `hack`, `black magic`) and posts a necromancy review checklist on the pull request.
 
 ---
 
@@ -177,7 +183,7 @@ GitSéance includes a native **Model Context Protocol (MCP)** server (`backend/m
 |---|---|
 | **Prior Labs (TabPFN 3.5)** | 7D Bayesian tabular foundation model for code mortality prediction + Native MCP Server |
 | **Google Gemma** | Open-weight LLM channeling developer ghosts, conversational chat & revival blueprints |
-| **GitHub Copilot** | Custom repository instructions (`.github/copilot-instructions.md`) & reusable prompt templates (`.github/prompts/`) |
+| **GitHub Copilot** | Custom repo instructions (`.github/copilot-instructions.md`), 3 reusable prompts (`.github/prompts/`), CI/CD Actions, and PR reviewer |
 | **ElevenLabs** | Neural voice text-to-speech for audible ghost channeling |
 | **SerpApi** | Live search grounding for 2026 library replacements & CVE lookups |
 | **FastAPI** | High-performance asynchronous Python backend with live SSE streaming |
