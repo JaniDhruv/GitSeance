@@ -1,0 +1,23 @@
+# 🔮 GitSéance — Render Blueprint Specification
+services:
+  - type: web
+    name: gitseance
+    runtime: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: TABPFN_API_KEY
+        sync: false
+      - key: SERPAPI_KEY
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
