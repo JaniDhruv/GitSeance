@@ -13,6 +13,10 @@
 > 
 > *Tagline:* *"Every codebase has ghosts. GitSéance channels them."*
 
+[![GitSéance Mortality](https://img.shields.io/badge/%F0%9F%94%AE%20GitS%C3%A9ance-98%25%20HAUNTED-e63946?style=for-the-badge)](https://github.com/JaniDhruv/GitSeance)
+[![Open Source AI](https://img.shields.io/badge/Open--Source%20AI-TabPFN%20%2B%20Gemma-00ff9d?style=for-the-badge)](https://github.com/JaniDhruv/GitSeance)
+[![CI Pipeline](https://img.shields.io/badge/CI%20Pipeline-25%20Passed-39ff14?style=for-the-badge)](https://github.com/JaniDhruv/GitSeance/actions)
+
 Built for **Hacktoberfest Open-Source AI Challenge: Week 4 ("Ghost in the Machine")**.
 
 ---
@@ -38,7 +42,7 @@ Built for **Hacktoberfest Open-Source AI Challenge: Week 4 ("Ghost in the Machin
         ┌──────────────┬───────────────┴───────────────┬──────────────┐
         ▼              ▼                               ▼              ▼
   💀 The Reaper   📊 The Oracle                  🔮 The Medium   🔍 The Searcher
- (Dead Code AST) (TabPFN-3.5 Mortality ML)       (Gemma 3 LLM)   (SerpApi Web Search)
+ (Dead Code AST) (TabPFN-3.5 Mortality ML)       (Gemma LLM)     (SerpApi Web Search)
         │              │                               │              │
         ▼              ▼                               ▼              ▼
    GitHub API      Prior Labs API                 Google GenAI    SerpApi & CVEs
@@ -68,12 +72,13 @@ Built for **Hacktoberfest Open-Source AI Challenge: Week 4 ("Ghost in the Machin
 - In contrast to rigid rule-based linters, TabPFN’s Bayesian Prior computes calibrated **Mortality Probability (0.0 to 1.0)**, predicting which active files are on the verge of becoming unmaintainable.
 
 ### 3. 🔮 The Medium Agent (`backend/agents/medium.py` + `backend/services/gemma_client.py`)
-- **Powered by Google Gemma 3 Open-Weight LLM**.
+- **Powered by Google Gemma Open-Weight LLM** (`gemma-4-26b-a4b-it`).
 - Channels the persona of the original developer who made the last commit.
 - Delivers a structured spiritual monologue:
   - **The Ghost's Confession**: Why the code was originally written under bygone constraints.
   - **The Unfinished Business**: What the ghost regrets not implementing.
   - **The Revival Blueprint**: Concrete migration steps, modern syntax replacements, and effort estimations.
+- **Conversational Séance (Interactive Chat)**: Allows living developers to ask follow-up questions directly to the ghost (`POST /api/seance/chat`), conversing back and forth in real-time!
 
 ### 4. 🔍 The Searcher Agent (`backend/agents/searcher.py` + `backend/services/serpapi_client.py`)
 - **Powered by SerpApi**.
@@ -87,12 +92,36 @@ Built for **Hacktoberfest Open-Source AI Challenge: Week 4 ("Ghost in the Machin
 
 ---
 
-## 🎨 Haunted CRT Frontend
+## 🎨 Haunted CRT Frontend & Standout Features
 
 - **Zero-Bloat Vanilla Stack**: Pure HTML5, Vanilla CSS3, and JavaScript ES6+ (no heavy Node build steps).
 - **Authentic Retro CRT Physics**: Phosphor green glow, authentic scanlines, glass vignette curvature, and screen jitter.
 - **Audio Synthesis Engine**: Web Audio API generates authentic mechanical keystroke clicks and ethereal summoning hums.
 - **Interactive Particle System**: Floating ectoplasmic canvas wisps and mouse trails.
+- **💬 Conversational Séance (Interactive Ghost Chat)**: Chat directly with the ghost of any file's original author inside the séance chamber.
+- **🪦 Official Post-Mortem Autopsy Certificates**: Generates downloadable vintage ASCII death certificates detailing cause of demise, bus factor, and TabPFN mortality score.
+- **🛡️ Live GitHub SVG Mortality Badge**: Embed a real-time mortality badge directly into any repository's `README.md` via `GET /api/badge/{owner}/{repo}.svg`.
+
+```
++========================================================================+
+|                     💀 OFFICIAL CODE AUTOPSY 💀                        |
+|                 DEPARTMENT OF SOFTWARE NECROMANCY                      |
++========================================================================+
+| DECEASED ARTIFACT   : flask_cache/__init__.py                          |
+| CHIEF ARCHITECT     : Armin Ronacher                                   |
+| DATE OF EXPIRATION  : 2016-04-12 (3,650 days inactive)                 |
+| FINAL RECORDED WORDS: "release 0.13.1"                                 |
+| TOTAL COMMITS       : 84 commits across file lifetime                  |
+| RECORDED BUS FACTOR : 1 author(s) recorded in blame                    |
+| HAUNTING STATUS     : DEAD                                             |
+| TABPFN MORTALITY    : 98% Bayesian mortality risk                     |
+| GHOST SEVERITY      : 0.95 / 1.00 index                                |
++------------------------------------------------------------------------+
+| GHOST TESTIMONY:                                                       |
+| "I am the lingering echo of Armin Ronacher. When I crafted this file,   |
+| modern paradigms didn't exist yet..."                                  |
++========================================================================+
+```
 
 ---
 
@@ -109,7 +138,7 @@ GitSéance is deeply integrated with **GitHub Copilot** to empower developers wi
 - **Standardized Review Checklist (`.github/pull_request_template.md`)**:
   - Enforces agent decoupling, TabPFN metric integrity, and offline fallback resilience on every pull request.
 - **Automated Multi-OS CI Workflows (`.github/workflows/ci.yml`)**:
-  - Continuous Integration pipeline testing across Ubuntu and Windows on Python 3.11 and 3.12.
+  - Continuous Integration pipeline testing across Ubuntu and Windows on Python 3.11 and 3.12 (25 unit and integration tests).
 
 ---
 
@@ -119,7 +148,7 @@ GitSéance is deeply integrated with **GitHub Copilot** to empower developers wi
 |---|---|
 | **GitHub Copilot** | Custom repository instructions (`.github/copilot-instructions.md`) & reusable prompt templates (`.github/prompts/`) |
 | **TabPFN 3.5** | Bayesian tabular neural network predicting file abandonment risk |
-| **Gemma 3** | Open-weight LLM channeling developer ghosts & revival blueprints |
+| **Google Gemma** | Open-weight LLM channeling developer ghosts, conversational chat & revival blueprints |
 | **ElevenLabs** | Neural voice text-to-speech for audible ghost channeling |
 | **SerpApi** | Live search grounding for 2026 library replacements & CVE lookups |
 | **FastAPI** | High-performance asynchronous Python backend with live SSE streaming |
@@ -141,11 +170,11 @@ cp .env.example .env
 Edit `.env` with your API keys:
 ```env
 GITHUB_TOKEN=ghp_your_github_token       # (Optional, boosts rate limits to 5,000 req/hr)
-GOOGLE_API_KEY=your_gemini_or_gemma_key   # Google AI Studio (free tier)
+GOOGLE_API_KEY=your_gemini_or_gemma_key   # Google AI Studio
 TABPFN_API_KEY=your_tabpfn_api_key       # Prior Labs API key
-SERPAPI_KEY=your_serpapi_key             # SerpApi free key (100 searches/mo)
+SERPAPI_KEY=your_serpapi_key             # SerpApi free key
 ELEVENLABS_API_KEY=your_elevenlabs_key   # ElevenLabs free key
-SENTRY_DSN=your_sentry_dsn               # Sentry error & AI tracing
+SENTRY_DSN=your_sentry_dsn               # Sentry error & AI tracing (optional)
 ```
 
 ### 2. Install Dependencies
@@ -156,9 +185,14 @@ pip install -r backend/requirements.txt
 ### 3. Run the Necromancer
 ```bash
 cd backend
-uvicorn main:app --reload --port 8000
+python -m uvicorn main:app --reload --port 8000
 ```
 Open **`http://localhost:8000`** in your browser. The haunted terminal will ignite!
+
+### 4. Run the Test Suite
+```bash
+python -m pytest backend/tests -v
+```
 
 ---
 
