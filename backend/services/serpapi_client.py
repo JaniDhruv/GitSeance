@@ -8,6 +8,55 @@ import sentry_sdk
 from config import get_settings
 
 
+CURATED_REPLACEMENTS = {
+    "flask-cache": {
+        "new_package": "Flask-Caching",
+        "reason": "Active community fork of Flask-Cache supporting Python 3.11+, Redis, Memcached, and async views.",
+        "url": "https://github.com/pallets-eco/flask-caching",
+    },
+    "flask_cache": {
+        "new_package": "Flask-Caching",
+        "reason": "Active community fork of Flask-Cache supporting Python 3.11+, Redis, Memcached, and async views.",
+        "url": "https://github.com/pallets-eco/flask-caching",
+    },
+    "urllib2": {
+        "new_package": "httpx",
+        "reason": "Next-generation HTTP client for Python 3 with async support, HTTP/2, and type safety.",
+        "url": "https://www.python-httpx.org",
+    },
+    "moment": {
+        "new_package": "dayjs",
+        "reason": "Fast 2KB alternative to Moment.js with the same modern API and immutable date chains.",
+        "url": "https://day.js.org",
+    },
+    "request": {
+        "new_package": "axios",
+        "reason": "Promise-based HTTP client for the browser and node.js, replacing deprecated request.",
+        "url": "https://axios-http.com",
+    },
+    "nose": {
+        "new_package": "pytest",
+        "reason": "Mature and modern test framework with powerful fixtures, plugins, and test discovery.",
+        "url": "https://docs.pytest.org",
+    },
+    "pycrypto": {
+        "new_package": "cryptography",
+        "reason": "Cryptographic recipes and primitives for Python developers, replacing vulnerable PyCrypto.",
+        "url": "https://cryptography.io",
+    },
+    "jquery-color": {
+        "new_package": "colord",
+        "reason": "Tiny 1.7KB color manipulation library with zero dependencies and TypeScript definitions.",
+        "url": "https://github.com/omgovich/colord",
+    },
+    "jquery.color": {
+        "new_package": "colord",
+        "reason": "Tiny 1.7KB color manipulation library with zero dependencies and TypeScript definitions.",
+        "url": "https://github.com/omgovich/colord",
+    },
+}
+
+
 class SerpApiClient:
     """Client for SerpApi — live web search for modern dependency replacements."""
 
@@ -26,7 +75,21 @@ class SerpApiClient:
             query += f" {language}"
 
         results = await self._search(query)
-        return self._parse_results(results, package_name)
+        parsed = self._parse_results(results, package_name)
+
+        # Fallback to curated knowledge base if SerpApi yielded nothing
+        if not parsed:
+            clean_pkg = package_name.lower().replace("_", "-")
+            if clean_pkg in CURATED_REPLACEMENTS:
+                entry = CURATED_REPLACEMENTS[clean_pkg]
+                parsed.append({
+                    "old_package": package_name,
+                    "new_package": entry["new_package"],
+                    "reason": entry["reason"],
+                    "url": entry["url"],
+                })
+
+        return parsed
 
     @sentry_sdk.trace
     async def search_cve(self, package_name: str) -> list[str]:
