@@ -38,21 +38,26 @@ jobs:
         with:
           script: |
             const fearDetected = "${{ steps.audit.outputs.found_fear }}" === "true";
-            const body = `### 🔮 GitSéance Necromancer Automated PR Review
+            const scanStatus = fearDetected 
+              ? "⚠️ Potential fear / hack comments detected in diff! Please ensure these are explained in the PR."
+              : "✨ Clean ectoplasm! No fear comments detected.";
 
-Welcome contributor! The spirits have inspected your pull request:
+            const body = [
+              "### 🔮 GitSéance Necromancer Automated PR Review",
+              "",
+              "Welcome contributor! The spirits have inspected your pull request:",
+              "",
+              "- **TabPFN 7D Schema Integrity**: Checked ✅",
+              "- **Offline Fallback Resilience**: Ensured ✅",
+              "- **MCP Server Compatibility**: Verified ✅",
+              `- **Fear Comment Scan**: ${scanStatus}`,
+              "",
+              "*Review automated via GitHub Actions & Copilot Necromancer review rules.*"
+            ].join("\n");
 
-- **TabPFN 7D Schema Integrity**: Checked ✅
-- **Offline Fallback Resilience**: Ensured ✅
-- **MCP Server Compatibility**: Verified ✅
-- **Fear Comment Scan**: ${fearDetected ? "⚠️ Potential fear / hack comments detected in diff! Please ensure these are explained in the PR." : "✨ Clean ectoplasm! No fear comments detected."}
-
-*Review automated via GitHub Actions & Copilot Necromancer review rules.*`;
-
-            github.rest.issues.createComment({
+            await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: body
             });
-
