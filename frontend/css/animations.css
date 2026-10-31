@@ -1,0 +1,132 @@
+/* 🔮 GIT SÉANCE — Spectral Animations & CRT Physics */
+
+@keyframes floatGhost {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-6px) rotate(-2deg);
+  }
+  75% {
+    transform: translateY(4px) rotate(2deg);
+  }
+}
+
+@keyframes pulseGhost {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 12px var(--ghost-green));
+  }
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+}
+
+/* CRT Screen Flicker Transition */
+@keyframes screenFlicker {
+  0% {
+    opacity: 0.97;
+  }
+  15% {
+    opacity: 0.7;
+    transform: translateY(1px);
+  }
+  25% {
+    opacity: 0.95;
+    transform: translateY(-1px);
+  }
+  30% {
+    opacity: 0.5;
+  }
+  45% {
+    opacity: 0.98;
+  }
+  60% {
+    opacity: 0.65;
+    transform: translateY(2px);
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.97;
+  }
+}
+
+.screen-flicker-active {
+  animation: screenFlicker 0.4s ease-out;
+}
+
+/* Blinking Cursor */
+.terminal-cursor {
+  display: inline-block;
+  width: 9px;
+  height: 1.1em;
+  background: var(--ghost-green-bright);
+  vertical-align: -2px;
+  animation: blinkCursor 1s step-end infinite;
+  box-shadow: 0 0 8px var(--ghost-green);
+}
+
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Glitch Heading Effect */
+.glitch-text {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  clip: rect(0, 0, 0, 0);
+}
+
+.glitch-text:hover::before {
+  left: -2px;
+  text-shadow: 2px 0 var(--dead-red);
+  animation: glitch-anim-1 1.5s infinite linear alternate-reverse;
+}
+
+.glitch-text:hover::after {
+  left: 2px;
+  text-shadow: -2px 0 var(--alive-cyan);
+  animation: glitch-anim-2 1.8s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim-1 {
+  0% { clip: rect(10px, 9999px, 30px, 0); }
+  25% { clip: rect(40px, 9999px, 60px, 0); }
+  50% { clip: rect(70px, 9999px, 85px, 0); }
+  75% { clip: rect(25px, 9999px, 45px, 0); }
+  100% { clip: rect(5px, 9999px, 20px, 0); }
+}
+
+@keyframes glitch-anim-2 {
+  0% { clip: rect(60px, 9999px, 75px, 0); }
+  25% { clip: rect(15px, 9999px, 35px, 0); }
+  50% { clip: rect(85px, 9999px, 100px, 0); }
+  75% { clip: rect(50px, 9999px, 65px, 0); }
+  100% { clip: rect(30px, 9999px, 45px, 0); }
+}

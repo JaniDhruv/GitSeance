@@ -1,0 +1,455 @@
+/* 🔮 GIT SÉANCE — Core Design System & CRT Engine */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,700;1,400&family=Share+Tech+Mono&family=VT323&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+:root {
+  /* Phosphor Palette */
+  --ghost-green: #00ff66;
+  --ghost-green-dim: #00b347;
+  --ghost-green-bright: #39ff84;
+  --ghost-green-glow: rgba(0, 255, 102, 0.35);
+  --ghost-green-soft: rgba(0, 255, 102, 0.08);
+
+  /* Status Accents */
+  --dead-red: #ff3355;
+  --dead-red-glow: rgba(255, 51, 85, 0.4);
+  --dead-red-soft: rgba(255, 51, 85, 0.12);
+  --haunted-amber: #ffaa00;
+  --haunted-amber-glow: rgba(255, 170, 0, 0.35);
+  --orphaned-purple: #bd00ff;
+  --cursed-crimson: #ff0055;
+  --alive-cyan: #00f0ff;
+  --alive-cyan-glow: rgba(0, 240, 255, 0.35);
+  --fading-slate: #7a9286;
+
+  /* Terminal Canvas */
+  --terminal-bg: #050806;
+  --terminal-card: #090f0b;
+  --terminal-elevated: #0f1812;
+  --terminal-border: #1a2e22;
+  --terminal-border-bright: #00ff66;
+  --terminal-text: #c5edd3;
+  --terminal-muted: #5e846f;
+  
+  /* Typography */
+  --font-display: 'VT323', monospace;
+  --font-mono: 'Share Tech Mono', 'JetBrains Mono', monospace;
+  --font-code: 'JetBrains Mono', monospace;
+  --font-sans: 'Space Grotesk', sans-serif;
+
+  /* Geometry & Shadows */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --glow-strong: 0 0 20px var(--ghost-green-glow), 0 0 40px rgba(0, 255, 102, 0.15);
+  --glow-box: inset 0 0 15px rgba(0, 255, 102, 0.08), 0 0 15px rgba(0, 255, 102, 0.12);
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--terminal-bg);
+  color: var(--terminal-text);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Background Ambient Canvas */
+#ghost-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+/* CRT Screen Simulation Container */
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999;
+  pointer-events: none;
+  background: 
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+  background-size: 100% 4px, 6px 100%;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.85);
+  transition: opacity 0.3s ease;
+}
+
+body.crt-disabled .crt-overlay {
+  display: none;
+}
+
+/* Vignette border curvature effect */
+.crt-vignette {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 998;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.75) 100%);
+}
+
+/* Master Layout */
+.app-container {
+  position: relative;
+  z-index: 10;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 20px 80px 20px;
+}
+
+/* Header & Mission Bar */
+.terminal-header {
+  border: 1px solid var(--terminal-border);
+  background: rgba(9, 15, 11, 0.9);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-md);
+  padding: 16px 24px;
+  margin-bottom: 28px;
+  box-shadow: var(--glow-box);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ghost-logo {
+  width: 44px;
+  height: 44px;
+  filter: drop-shadow(0 0 10px var(--ghost-green));
+  animation: floatGhost 4s ease-in-out infinite;
+}
+
+.brand-title {
+  font-family: var(--font-display);
+  font-size: 38px;
+  letter-spacing: 3px;
+  color: var(--ghost-green-bright);
+  text-shadow: 0 0 10px var(--ghost-green-glow), 0 0 20px var(--ghost-green-glow);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1;
+}
+
+.brand-tagline {
+  font-size: 13px;
+  color: var(--terminal-muted);
+  letter-spacing: 1px;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ctrl-btn {
+  background: var(--terminal-elevated);
+  border: 1px solid var(--terminal-border);
+  color: var(--terminal-text);
+  padding: 6px 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.ctrl-btn:hover {
+  border-color: var(--ghost-green);
+  color: var(--ghost-green-bright);
+  box-shadow: 0 0 10px var(--ghost-green-glow);
+}
+
+.ctrl-btn.active {
+  background: var(--ghost-green-soft);
+  border-color: var(--ghost-green);
+  color: var(--ghost-green-bright);
+}
+
+/* Partner Technology HUD Pills */
+.agent-telemetry-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--terminal-border);
+}
+
+.telemetry-pill {
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: var(--terminal-elevated);
+  border: 1px solid var(--terminal-border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--terminal-muted);
+  transition: all 0.3s ease;
+}
+
+.telemetry-pill.active {
+  border-color: rgba(0, 255, 102, 0.4);
+  color: var(--ghost-green-bright);
+  background: rgba(0, 255, 102, 0.05);
+}
+
+.telemetry-pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--terminal-muted);
+}
+
+.telemetry-pill.active .dot {
+  background: var(--ghost-green-bright);
+  box-shadow: 0 0 6px var(--ghost-green-bright);
+  animation: pulseDot 2s infinite;
+}
+
+/* Altar / Repo Input Station */
+.altar-card {
+  background: rgba(9, 15, 11, 0.85);
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-md);
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: var(--glow-box);
+  position: relative;
+  overflow: hidden;
+}
+
+.altar-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--ghost-green), transparent);
+}
+
+.altar-headline {
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 2px;
+  color: var(--ghost-green-bright);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.altar-subtext {
+  font-size: 14px;
+  color: var(--terminal-muted);
+  margin-bottom: 24px;
+  max-width: 850px;
+}
+
+.summon-form {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.prompt-prefix {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background: var(--terminal-elevated);
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-sm);
+  color: var(--ghost-green);
+  font-family: var(--font-mono);
+  font-weight: bold;
+}
+
+.summon-input {
+  flex: 1;
+  min-width: 280px;
+  background: var(--terminal-bg);
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  color: var(--ghost-green-bright);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.summon-input:focus {
+  border-color: var(--ghost-green);
+  box-shadow: 0 0 15px var(--ghost-green-glow);
+}
+
+.summon-btn {
+  background: var(--ghost-green);
+  color: #030804;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  font-size: 15px;
+  letter-spacing: 1px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 15px var(--ghost-green-glow);
+}
+
+.summon-btn:hover {
+  background: var(--ghost-green-bright);
+  transform: translateY(-1px);
+  box-shadow: 0 0 25px var(--ghost-green);
+}
+
+.summon-btn:active {
+  transform: translateY(1px);
+}
+
+.summon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Quick Summon Presets */
+.preset-graveyards {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.preset-label {
+  font-size: 12px;
+  color: var(--terminal-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.preset-chip {
+  background: var(--terminal-elevated);
+  border: 1px solid var(--terminal-border);
+  color: var(--terminal-text);
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.preset-chip:hover {
+  border-color: var(--ghost-green);
+  color: var(--ghost-green-bright);
+  background: var(--ghost-green-soft);
+}
+
+/* Live Terminal Log Stream */
+.telemetry-console {
+  background: #020403;
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  margin-bottom: 32px;
+  font-family: var(--font-code);
+  font-size: 13px;
+  line-height: 1.5;
+  max-height: 180px;
+  overflow-y: auto;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+  display: none;
+}
+
+.telemetry-console.active {
+  display: block;
+}
+
+.log-entry {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+
+.log-entry.agent-reaper { color: #88ff88; }
+.log-entry.agent-oracle { color: #00f0ff; }
+.log-entry.agent-medium { color: #ffaa00; }
+.log-entry.agent-searcher { color: #39ff84; }
+.log-entry.agent-error { color: var(--dead-red); }
+
+.log-time {
+  color: var(--terminal-muted);
+  flex-shrink: 0;
+}
+
+/* Ghost Cursor Trailer */
+.ectoplasm-particle {
+  position: fixed;
+  pointer-events: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ghost-green);
+  box-shadow: 0 0 8px var(--ghost-green);
+  z-index: 1000;
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+/* Utility classes */
+.text-ghost { color: var(--ghost-green-bright); }
+.text-dead { color: var(--dead-red); }
+.text-haunted { color: var(--haunted-amber); }
+.text-alive { color: var(--alive-cyan); }
+.text-muted { color: var(--terminal-muted); }
