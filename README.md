@@ -73,6 +73,8 @@ Built for **Hacktoberfest Open-Source AI Challenge: Week 4 ("Ghost in the Machin
   - `has_tests` (binary test indicator)
   - `churn_velocity` (commits per month)
 - In contrast to rigid rule-based linters, TabPFN’s Bayesian Prior computes calibrated **Mortality Probability (0.0 to 1.0)**, predicting which active files are on the verge of becoming unmaintainable.
+- **📊 7D Tabular CSV Dataset Export**: One-click download of the complete 7-dimensional feature distribution for audit and offline analysis.
+- **🔌 Model Context Protocol (MCP) Server (`backend/mcp_server.py`)**: Exposes TabPFN Bayesian prediction and the necromancy agent tools directly to Cursor, Claude Desktop, Antigravity, and GitHub Copilot!
 
 ### 3. 🔮 The Medium Agent (`backend/agents/medium.py` + `backend/services/gemma_client.py`)
 - **Powered by Google Gemma Open-Weight LLM** (`gemma-4-26b-a4b-it`).
@@ -145,13 +147,37 @@ GitSéance is deeply integrated with **GitHub Copilot** to empower developers wi
 
 ---
 
+## 🔌 Model Context Protocol (MCP) Server
+
+GitSéance includes a native **Model Context Protocol (MCP)** server (`backend/mcp_server.py`) that exposes its agents and TabPFN tabular prediction directly to **Cursor**, **Claude Desktop**, **Antigravity**, and **GitHub Copilot**:
+
+### MCP Tools Available:
+- **`tabpfn_predict_mortality`**: Runs Prior Labs TabPFN-3.5 on a 7-dimensional git forensic vector to predict code abandonment risk.
+- **`reaper_scan_graveyard`**: Scans a GitHub repo and returns forensic mortality metrics for all files.
+- **`gemma_channel_ghost`**: Channels the developer ghost for a specific file via Google Gemma.
+- **`searcher_modernize_deps`**: Audits deprecated packages and looks up live 2026 replacements + CVEs via SerpApi.
+
+### Add to Cursor (`.cursor/mcp.json`) or Claude Desktop:
+```json
+{
+  "mcpServers": {
+    "gitseance": {
+      "command": "python",
+      "args": ["backend/mcp_server.py"]
+    }
+  }
+}
+```
+
+---
+
 ## 🛠️ Technology Integration Matrix
 
 | Partner / Tool | Role in GitSéance |
 |---|---|
-| **GitHub Copilot** | Custom repository instructions (`.github/copilot-instructions.md`) & reusable prompt templates (`.github/prompts/`) |
-| **TabPFN 3.5** | Bayesian tabular neural network predicting file abandonment risk |
+| **Prior Labs (TabPFN 3.5)** | 7D Bayesian tabular foundation model for code mortality prediction + Native MCP Server |
 | **Google Gemma** | Open-weight LLM channeling developer ghosts, conversational chat & revival blueprints |
+| **GitHub Copilot** | Custom repository instructions (`.github/copilot-instructions.md`) & reusable prompt templates (`.github/prompts/`) |
 | **ElevenLabs** | Neural voice text-to-speech for audible ghost channeling |
 | **SerpApi** | Live search grounding for 2026 library replacements & CVE lookups |
 | **FastAPI** | High-performance asynchronous Python backend with live SSE streaming |

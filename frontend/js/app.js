@@ -246,6 +246,14 @@ function setupToolbarListeners() {
     };
   }
 
+  const csvBtn = document.getElementById('export-csv-btn');
+  if (csvBtn) {
+    csvBtn.onclick = () => {
+      SoundFX.playKeyClick();
+      exportTabPFNCSVReport();
+    };
+  }
+
   const jsonBtn = document.getElementById('export-json-btn');
   if (jsonBtn) {
     jsonBtn.onclick = () => {
@@ -253,6 +261,54 @@ function setupToolbarListeners() {
       exportJsonReport();
     };
   }
+}
+
+function exportTabPFNCSVReport() {
+  if (!currentSeanceData) return;
+  const d = currentSeanceData;
+  const headers = [
+    'file_path',
+    'status',
+    'tabpfn_mortality_risk',
+    'ghost_score',
+    'days_since_last_commit',
+    'total_commits',
+    'unique_authors',
+    'bug_fix_commit_ratio',
+    'lines_added',
+    'lines_deleted',
+    'has_tests',
+    'churn_velocity',
+    'last_author',
+    'last_commit_date',
+  ];
+
+  const rows = [headers.join(',')];
+
+  d.haunting_reports.forEach((r) => {
+    const m = r.metrics;
+    const risk = r.mortality_risk !== null ? r.mortality_risk.toFixed(4) : r.ghost_score.toFixed(4);
+    const row = [
+      `"${r.file_path.replace(/"/g, '""')}"`,
+      r.status,
+      risk,
+      r.ghost_score.toFixed(4),
+      m.days_since_last_commit,
+      m.total_commits,
+      m.unique_authors,
+      m.bug_fix_commit_ratio.toFixed(4),
+      m.lines_added,
+      m.lines_deleted,
+      m.has_tests ? 1 : 0,
+      m.churn_velocity.toFixed(4),
+      `"${(m.last_author || 'unknown').replace(/"/g, '""')}"`,
+      `"${m.last_commit_date || ''}"`,
+    ];
+    rows.push(row.join(','));
+  });
+
+  const csvContent = rows.join('\r\n');
+  downloadBlob(csvContent, `tabpfn-${d.repo_name}-forensic-dataset.csv`, 'text/csv');
 }
 
 function copyBadgeSnippet() {
