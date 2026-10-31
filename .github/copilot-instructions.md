@@ -82,3 +82,4 @@ Before committing changes:
 1. Run `python -m pytest backend/tests -v` to ensure all 23+ unit and integration tests pass.
 2. Ensure no hardcoded secrets or API keys are committed (enforced by `.gitignore`).
 3. Verify that all async routes handle timeouts and missing API keys gracefully.
+

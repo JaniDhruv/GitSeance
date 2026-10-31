@@ -29,3 +29,4 @@ To predict whether active code is on the verge of rot and abandonment, compute t
 - **0.70 - 1.00 (Clinically Dead / Cursed)**: Untouched for 2+ years (`days >= 730`) or severe bug-fix density. Immediate refactoring required.
 
 Now, ask the user for the git commit log or file metrics, extract the 7 features, and output the calibrated TabPFN mortality assessment!
+

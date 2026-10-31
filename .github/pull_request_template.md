@@ -12,3 +12,4 @@
 - [ ] **Haunted CRT Aesthetics**: Pure vanilla HTML5/CSS3/ES6+ maintained; no unwanted bundlers or framework bloat introduced.
 - [ ] **Unit Tests Passed**: Verified with `python -m pytest backend/tests` (all tests passing).
 - [ ] **No Committed Secrets**: `.env` and sensitive API keys are excluded.
+
