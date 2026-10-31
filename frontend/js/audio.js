@@ -170,6 +170,20 @@ const GhostVoicePlayer = (function () {
         const audio = new Audio(data.audio_url);
         currentAudio = audio;
 
+        // Enable MP3 Download Button
+        const downloadBtn = document.getElementById('download-voice-btn');
+        if (downloadBtn && data.audio_url) {
+          downloadBtn.style.display = 'inline-flex';
+          downloadBtn.onclick = () => {
+            const a = document.createElement('a');
+            a.href = data.audio_url;
+            a.download = `ghost-transmission-${voice}.mp3`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          };
+        }
+
         audio.onplay = () => {
           if (btnElement) {
             btnElement.disabled = false;

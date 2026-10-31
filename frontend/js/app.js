@@ -581,6 +581,8 @@ async function openSeanceChamber(filePath) {
   const downloadAutopsyBtn = document.getElementById('download-autopsy-btn');
 
   if (autopsyDrawer) autopsyDrawer.style.display = 'none';
+  const downloadVoiceBtn = document.getElementById('download-voice-btn');
+  if (downloadVoiceBtn) downloadVoiceBtn.style.display = 'none';
 
   // Chat elements
   const chatStream = document.getElementById('ghost-chat-stream');
