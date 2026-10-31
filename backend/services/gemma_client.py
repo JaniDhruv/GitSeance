@@ -45,8 +45,7 @@ Keep responses vivid, personal, and under 300 words. You're telling a ghost stor
         """Extract content text from Google GenAI response, filtering thought tokens if present."""
         if not response:
             return ""
-        if hasattr(response, "text") and response.text:
-            return response.text.strip()
+        # 1. Prioritize inspecting candidate parts to filter out internal chain-of-thought tokens
         if hasattr(response, "candidates") and response.candidates:
             candidate = response.candidates[0]
             if hasattr(candidate, "content") and hasattr(candidate.content, "parts"):
@@ -57,6 +56,9 @@ Keep responses vivid, personal, and under 300 words. You're telling a ghost stor
                 ]
                 if actual_parts:
                     return "".join(actual_parts).strip()
+        # 2. Fallback to response.text if candidates or parts aren't directly available
+        if hasattr(response, "text") and response.text:
+            return response.text.strip()
         return ""
 
     @sentry_sdk.trace
