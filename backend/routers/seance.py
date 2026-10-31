@@ -12,6 +12,7 @@ from models.schemas import (
     SeanceRequest, SeanceResponse,
     ChannelRequest, ChannelResponse,
     GhostChatRequest, GhostChatResponse,
+    GhostChanneling, RevivalPatch,
     HauntingStatus,
 )
 from agents.reaper import ReaperAgent
