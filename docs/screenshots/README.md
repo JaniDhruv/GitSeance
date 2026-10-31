@@ -41,3 +41,17 @@ Visual proof and UI walkthrough of GitSéance running in live production against
 **File:** `05-ascii-autopsy-certificate.jpg`  
 **Description:** Official ASCII death certificate drawer detailing deceased artifact metadata, bus factor, chief architect, TabPFN mortality score (80%), ghost testimony, and forensic stamps.
 
+---
+
+### 6. ElevenLabs Ghost Voice Synthesis & MP3 Export
+**File:** `06-ghost-voice-download-mp3.jpg`  
+**Audio Recording:** [`docs/audio/ghost-transmission-thadeus-makefile.mp3`](../audio/ghost-transmission-thadeus-makefile.mp3)  
+**Description:** Demonstrates the real-time ElevenLabs voice channeling for `Makefile` with the newly integrated **`⬇️ Download MP3`** button. The synthesized transmission channels the spectral voice of chief architect Thadeus Burgess.
+
+#### Spoken Transmission Transcript:
+> *"I am the lingering echo of Thadeus Burgess. On 2010-08-30T09:39:36Z, I pushed my final commit: 'R-0.1'. Then I walked away into the darkness, leaving Makefile behind to freeze in time."*
+
+- **Voice Preset:** Roger (Ancient Architect)
+- **Runtime Engine:** ElevenLabs Multilingual Neural TTS (`eleven_multilingual_v2`)
+- **Audio File Asset:** `docs/audio/ghost-transmission-thadeus-makefile.mp3` (290 KB MP3)
+
