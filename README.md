@@ -12,8 +12,11 @@
 > **An Open-Source AI Necromancer that brings "dead" GitHub repositories back to life — and predicts which files are about to die next.**
 > 
 > *Tagline:* *"Every codebase has ghosts. GitSéance channels them."*
+> 
+> 🌐 **Live Demo:** [https://gitseance.onrender.com](https://gitseance.onrender.com)
 
-[![GitSéance Mortality](https://img.shields.io/badge/%F0%9F%94%AE%20GitS%C3%A9ance-98%25%20HAUNTED-e63946?style=for-the-badge)](https://github.com/JaniDhruv/GitSeance)
+[![Live Demo](https://img.shields.io/badge/%F0%9F%9A%80%20Live%20Demo-gitseance.onrender.com-58a6ff?style=for-the-badge)](https://gitseance.onrender.com)
+[![GitSéance Mortality](https://gitseance.onrender.com/api/badge/mitsuhiko/flask-cache.svg)](https://gitseance.onrender.com)
 [![Open Source AI](https://img.shields.io/badge/Open--Source%20AI-TabPFN%20%2B%20Gemma-00ff9d?style=for-the-badge)](https://github.com/JaniDhruv/GitSeance)
 [![CI Pipeline](https://img.shields.io/badge/CI%20Pipeline-25%20Passed-39ff14?style=for-the-badge)](https://github.com/JaniDhruv/GitSeance/actions)
 
