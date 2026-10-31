@@ -55,3 +55,4 @@ Welcome contributor! The spirits have inspected your pull request:
               repo: context.repo.repo,
               body: body
             });
+

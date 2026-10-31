@@ -77,3 +77,4 @@ jobs:
           - **TabPFN Mortality ML**: `POST /api/seance/scan`
           - **Forensic CSV Export**: Available in UI & API
           EOF
+
