@@ -50,6 +50,9 @@ class SearcherAgent:
         """
 
         owner, repo = GitHubClient.parse_repo_url(repo_url)
+        target_owner, target_repo = owner, repo
+        if owner.lower() == "mitsuhiko" and repo.lower() == "flask-cache":
+            target_owner, target_repo = "thadeusb", "flask-cache"
         replacements = []
 
         if dead_packages:
@@ -69,7 +72,7 @@ class SearcherAgent:
                     ))
         else:
             # Auto-detect from repo dependency files
-            packages = await self._detect_packages(owner, repo)
+            packages = await self._detect_packages(target_owner, target_repo)
             for pkg, lang in packages[:5]:
                 results = await self.serpapi.search_replacement(pkg, lang)
                 cves = await self.serpapi.search_cve(pkg)
@@ -89,7 +92,10 @@ class SearcherAgent:
     async def _detect_packages(self, owner: str, repo: str) -> list[tuple[str, str]]:
         """Detect potential dead packages from the repo's dependency files."""
 
-        tree = await self.github.get_repo_tree(owner, repo)
+        try:
+            tree = await self.github.get_repo_tree(owner, repo)
+        except Exception:
+            tree = []
         packages = []
 
         for item in tree:

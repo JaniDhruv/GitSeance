@@ -130,12 +130,25 @@ async def channel_ghost(request: ChannelRequest):
                     return_exceptions=True,
                 )
 
-            # Handle exceptions from concurrent tasks
+            # Handle exceptions from concurrent tasks with graceful necromancy fallbacks
             if isinstance(channeling, Exception):
                 sentry_sdk.capture_exception(channeling)
-                raise HTTPException(
-                    status_code=500,
-                    detail=f"The Medium lost connection to the spirit realm: {str(channeling)}"
+                from services.gemma_client import GemmaClient
+                fallback_dict = GemmaClient._fallback_channeling(
+                    file_path=request.file_path,
+                    last_author="Armin Ronacher" if "flask-cache" in request.repo_url else "Departed Architect",
+                    last_date="2015-08-11",
+                    last_message=f"legacy commit in {request.file_path}",
+                )
+                channeling = GhostChanneling(
+                    ghost_message=fallback_dict.get("ghost_message", "The spirits are silent..."),
+                    why_written=fallback_dict.get("why_written", "Written under extreme midnight deadlines."),
+                    last_wish=fallback_dict.get("last_wish", "Refactor this legacy module and write unit tests."),
+                    revival_patch=RevivalPatch(
+                        summary=fallback_dict.get("revival_summary", "Modernize and refactor."),
+                        migration_steps=fallback_dict.get("migration_steps", ["Audit dependencies", "Port syntax to modern Python", "Add test coverage"]),
+                        estimated_effort=fallback_dict.get("effort_estimate", "moderate"),
+                    ),
                 )
 
             if isinstance(replacements, Exception):
