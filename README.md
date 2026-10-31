@@ -25,6 +25,27 @@ Built for **Hacktoberfest Open-Source AI Challenge: Week 4 ("Ghost in the Machin
 
 ---
 
+## 📸 Production Gallery
+
+<div align="center">
+  <img src="docs/screenshots/01-seance-altar-hero.jpg" alt="GitSéance Altar & CRT Terminal" width="850px" />
+  <p><em>🔮 Phosphor-Green CRT Terminal with Live AI Status & Streaming Necromancy Logs</em></p>
+  
+  <br/>
+  
+  <img src="docs/screenshots/02-tabpfn-mortality-scan.jpg" alt="TabPFN Code Mortality Scan" width="850px" />
+  <p><em>📊 TabPFN-3.5 Bayesian Mortality Predictions & Code Graveyard Roster</em></p>
+
+  <br/>
+
+  <img src="docs/screenshots/08-ghost-chat-dialogue-part2.jpg" alt="Interactive Conversational Ghost Séance" width="850px" />
+  <p><em>💬 Conversational Séance: Interrogating Departed Architect Thadeus Burgess via Google Gemma</em></p>
+</div>
+
+> 📁 *Explore the complete visual walkthrough and audio recordings in [docs/screenshots](docs/screenshots).*
+
+---
+
 ## 🌟 The Core Problem
 
 73% of abandoned code repositories haven't been touched in over two years. In nearly every enterprise and open-source project, there is a haunted file marked with `// DO NOT TOUCH: NOBODY KNOWS WHY THIS WORKS`. When the original author moves on, their domain knowledge vanishes with them. The code slowly rots, vulnerabilities creep in, and fear prevents anyone from refactoring it.

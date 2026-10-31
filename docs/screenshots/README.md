@@ -55,3 +55,16 @@ Visual proof and UI walkthrough of GitSéance running in live production against
 - **Runtime Engine:** ElevenLabs Multilingual Neural TTS (`eleven_multilingual_v2`)
 - **Audio File Asset:** `docs/audio/ghost-transmission-thadeus-makefile.mp3` (290 KB MP3)
 
+---
+
+### 7. Conversational Séance Interactive Dialogue (Multi-Turn Chat)
+**Files:** `07-ghost-chat-dialogue-part1.png`, `08-ghost-chat-dialogue-part2.jpg`  
+**Description:** Real-time conversational séance session interrogating departed architect Thadeus Burgess about historical packaging decisions and legacy technical debt in `Makefile`.
+
+#### Multi-Turn Transcript:
+> **GHOST:** "I am the spirit of Thadeus Burgess. Speak your questions, living developer. What troubles you about Makefile?"  
+> **YOU:** "Why did you use setup.py upload instead of modern twine packaging?"  
+> **GHOST:** *"Ah, you ask why I wrote it like this in `Makefile`... In those days, we were racing against the clock. The libraries you take for granted in 2026 didn't exist, and memory was scarce. It was the best compromise I could conjure."*  
+> **YOU:** "Is there any secret hack or danger if I refactor or delete this Makefile today?"  
+> **GHOST:** *"You noticed the scar, did you? Yes, I left that hack in `Makefile` at 2 AM before a release. I promised myself I would refactor it that weekend... but that weekend never came. Please, bury it for me."*
+
