@@ -42,6 +42,22 @@ class TTSRequest(BaseModel):
     voice: str = Field(default="aria", description="ElevenLabs voice ID or name")
 
 
+class GhostChatMessage(BaseModel):
+    """A single chat dialogue turn with a code ghost."""
+    role: str = Field(..., description="'user' or 'ghost'")
+    content: str
+
+
+class GhostChatRequest(BaseModel):
+    """Request to chat with a channeled developer ghost."""
+    repo_url: str
+    file_path: str
+    author_name: str = "an ancient author"
+    file_content: Optional[str] = None
+    message: str = Field(..., max_length=1000)
+    history: list[GhostChatMessage] = Field(default_factory=list)
+
+
 # ──────────────────────────────────────────────
 # Response Components
 # ──────────────────────────────────────────────
@@ -121,6 +137,12 @@ class ChannelResponse(BaseModel):
     file_path: str
     channeling: GhostChanneling
     replacements: list[DependencyReplacement] = Field(default_factory=list)
+
+
+class GhostChatResponse(BaseModel):
+    """Response from conversing with a code ghost."""
+    reply: str
+    model_used: str = "gemma-4-26b-a4b-it"
 
 
 class TTSResponse(BaseModel):

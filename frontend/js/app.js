@@ -8,6 +8,11 @@ let currentFilter = 'all';
 let currentSort = 'mortality';
 let currentSearch = '';
 
+// Active modal séance session state
+let activeReportData = null;
+let activeChannelingData = null;
+let activeChatHistory = [];
+
 document.addEventListener('DOMContentLoaded', () => {
   initControls();
   initForm();
@@ -223,21 +228,49 @@ function setupToolbarListeners() {
     });
   }
 
+  // Badge button
+  const badgeBtn = document.getElementById('embed-badge-btn');
+  if (badgeBtn) {
+    badgeBtn.onclick = () => {
+      SoundFX.playKeyClick();
+      copyBadgeSnippet();
+    };
+  }
+
   // Export buttons
   const mdBtn = document.getElementById('export-markdown-btn');
   if (mdBtn) {
-    mdBtn.addEventListener('click', () => {
+    mdBtn.onclick = () => {
       SoundFX.playKeyClick();
       exportMarkdownReport();
-    });
+    };
   }
 
   const jsonBtn = document.getElementById('export-json-btn');
   if (jsonBtn) {
-    jsonBtn.addEventListener('click', () => {
+    jsonBtn.onclick = () => {
       SoundFX.playKeyClick();
       exportJsonReport();
-    });
+    };
+  }
+}
+
+function copyBadgeSnippet() {
+  if (!currentRepoUrl) return;
+  const match = currentRepoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+  const owner = match ? match[1] : 'owner';
+  const repo = match ? match[2].replace(/\.git$/, '') : 'repo';
+  const origin = window.location.origin;
+  const badgeUrl = `${origin}/api/badge/${owner}/${repo}.svg`;
+  const snippet = `[![GitSéance Mortality](${badgeUrl})](${currentRepoUrl})`;
+  navigator.clipboard.writeText(snippet);
+
+  const badgeBtn = document.getElementById('embed-badge-btn');
+  if (badgeBtn) {
+    badgeBtn.textContent = '✅ Copied!';
+    setTimeout(() => {
+      badgeBtn.textContent = '🛡️ Badge';
+    }, 2500);
   }
 }
 
@@ -285,6 +318,40 @@ function downloadBlob(content, filename, mimeType) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+function generateAutopsyCertificate(report, channeling) {
+  if (!report) return 'Autopsy record unavailable.';
+  const m = report.metrics;
+  const risk = report.mortality_risk !== null ? `${Math.round(report.mortality_risk * 100)}%` : `${Math.round(report.ghost_score * 100)}%`;
+  const cleanAuthor = m.last_author || 'Unknown Contributor';
+  const statusStr = report.status.toUpperCase();
+  const dateStr = (m.last_commit_date || 'UNKNOWN').split('T')[0];
+  const lastMsg = (m.last_commit_message || 'Initial changes').replace(/[\r\n]+/g, ' ').slice(0, 36);
+  const partingWords = (channeling ? channeling.ghost_message : 'My spirit remains bound to these instructions.').slice(0, 110);
+  const effortStr = channeling ? channeling.revival_patch.estimated_effort.toUpperCase() : 'MODERATE';
+
+  return `+========================================================================+
+|                     💀 OFFICIAL CODE AUTOPSY 💀                        |
+|                 DEPARTMENT OF SOFTWARE NECROMANCY                      |
++========================================================================+
+| DECEASED ARTIFACT   : ${report.file_path.padEnd(48, ' ')} |
+| CHIEF ARCHITECT     : ${cleanAuthor.padEnd(48, ' ')} |
+| DATE OF EXPIRATION  : ${(dateStr + ' (' + m.days_since_last_commit + ' days inactive)').padEnd(48, ' ')} |
+| FINAL RECORDED WORDS: ${('"' + lastMsg + '"').padEnd(48, ' ')} |
+| TOTAL COMMITS       : ${(m.total_commits + ' commits across file lifetime').padEnd(48, ' ')} |
+| RECORDED BUS FACTOR : ${(m.unique_authors + ' author(s) recorded in blame').padEnd(48, ' ')} |
+| HAUNTING STATUS     : ${statusStr.padEnd(48, ' ')} |
+| TABPFN MORTALITY    : ${(risk + ' Bayesian mortality risk').padEnd(48, ' ')} |
+| GHOST SEVERITY      : ${(report.ghost_score.toFixed(2) + ' / 1.00 index').padEnd(48, ' ')} |
++------------------------------------------------------------------------+
+| GHOST TESTIMONY:                                                       |
+| "${partingWords}"
++------------------------------------------------------------------------+
+| REVIVAL EFFORT      : ${effortStr.padEnd(48, ' ')} |
+| CERTIFICATE STAMP   : GITSEANCE FORENSIC ENGINE v1.0.0                 |
+| AI RUNTIMES         : TABPFN-3.5 + GOOGLE GEMMA + ELEVENLABS           |
++========================================================================+`;
 }
 
 function renderFileRoster() {
@@ -433,6 +500,11 @@ async function openSeanceChamber(filePath) {
   SoundFX.playChannelingChime();
   modal.classList.add('active');
 
+  // Find report for this file
+  activeReportData = currentSeanceData?.haunting_reports?.find((r) => r.file_path === filePath) || null;
+  activeChannelingData = null;
+  activeChatHistory = [];
+
   const titleElem = document.getElementById('chamber-file-title');
   const monologueElem = document.getElementById('chamber-monologue');
   const whyElem = document.getElementById('chamber-why');
@@ -444,12 +516,37 @@ async function openSeanceChamber(filePath) {
   const voiceSelect = document.getElementById('voice-select');
   const canvas = document.getElementById('waveform-canvas');
 
+  // Autopsy drawer elements
+  const autopsyBtn = document.getElementById('print-autopsy-btn');
+  const autopsyDrawer = document.getElementById('autopsy-drawer');
+  const autopsyPre = document.getElementById('autopsy-pre');
+  const closeAutopsyBtn = document.getElementById('close-autopsy-btn');
+  const copyAutopsyBtn = document.getElementById('copy-autopsy-btn');
+  const downloadAutopsyBtn = document.getElementById('download-autopsy-btn');
+
+  if (autopsyDrawer) autopsyDrawer.style.display = 'none';
+
+  // Chat elements
+  const chatStream = document.getElementById('ghost-chat-stream');
+  const chatForm = document.getElementById('ghost-chat-form');
+  const chatInput = document.getElementById('ghost-chat-input');
+  const chatTag = document.getElementById('chat-model-badge');
+
   titleElem.textContent = filePath;
-  monologueElem.innerHTML = '<em>Consulting the spirit realm via Gemma 3...</em>';
+  monologueElem.innerHTML = '<em>Consulting the spirit realm via Gemma...</em>';
   whyElem.textContent = 'Channeling...';
   wishElem.textContent = 'Channeling...';
   stepsElem.innerHTML = '<li>Analyzing ancient syntax...</li>';
   serpListElem.innerHTML = '<div>Searching real-time 2026 intelligence via SerpApi...</div>';
+
+  if (chatStream) {
+    const author = activeReportData?.metrics?.last_author || 'the author';
+    chatStream.innerHTML = `
+      <div class="chat-bubble bubble-ghost">
+        <span class="bubble-speaker">GHOST:</span> I am the spirit of ${author}. Speak your questions, living developer. What troubles you about ${filePath}?
+      </div>
+    `;
+  }
 
   try {
     const res = await fetch('/api/seance/channel', {
@@ -462,15 +559,16 @@ async function openSeanceChamber(filePath) {
     });
 
     if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.detail || 'Channeling interrupted');
+      const err = await responseError(res);
+      throw new Error(err);
     }
 
     const data = await res.json();
     const ch = data.channeling;
+    activeChannelingData = ch;
 
     // Typewriter effect for ghost message
-    Terminal.typewriter(monologueElem, ch.ghost_message, 22);
+    Terminal.typewriter(monologueElem, ch.ghost_message, 20);
 
     whyElem.textContent = ch.why_written;
     wishElem.textContent = ch.last_wish;
@@ -526,7 +624,117 @@ async function openSeanceChamber(filePath) {
         }, 2000);
       };
     }
+
+    // Autopsy Certificate wiring
+    if (autopsyBtn && autopsyDrawer && autopsyPre) {
+      autopsyBtn.onclick = () => {
+        const cert = generateAutopsyCertificate(activeReportData, activeChannelingData);
+        autopsyPre.textContent = cert;
+        autopsyDrawer.style.display = 'block';
+        SoundFX.playKeyClick();
+        autopsyDrawer.scrollIntoView({ behavior: 'smooth' });
+      };
+    }
+
+    if (closeAutopsyBtn && autopsyDrawer) {
+      closeAutopsyBtn.onclick = () => {
+        autopsyDrawer.style.display = 'none';
+        SoundFX.playKeyClick();
+      };
+    }
+
+    if (copyAutopsyBtn && autopsyPre) {
+      copyAutopsyBtn.onclick = () => {
+        navigator.clipboard.writeText(autopsyPre.textContent);
+        copyAutopsyBtn.textContent = '✅ Copied!';
+        setTimeout(() => { copyAutopsyBtn.textContent = '📋 Copy Certificate'; }, 2000);
+      };
+    }
+
+    if (downloadAutopsyBtn && autopsyPre) {
+      downloadAutopsyBtn.onclick = () => {
+        const cleanName = filePath.replace(/[^a-zA-Z0-9_-]/g, '_');
+        downloadBlob(autopsyPre.textContent, `${cleanName}-autopsy-certificate.txt`, 'text/plain');
+      };
+    }
+
+    // Conversational Chat form handler
+    if (chatForm && chatInput && chatStream) {
+      chatForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const userMsg = chatInput.value.trim();
+        if (!userMsg) return;
+
+        // Append user bubble
+        appendChatBubble(chatStream, 'user', userMsg);
+        chatInput.value = '';
+        SoundFX.playKeyClick();
+
+        activeChatHistory.push({ role: 'user', content: userMsg });
+
+        // Append pending ghost bubble
+        const pendingBubble = appendChatBubble(chatStream, 'ghost', '...');
+        chatStream.scrollTop = chatStream.scrollHeight;
+
+        try {
+          const resp = await fetch('/api/seance/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              repo_url: currentRepoUrl,
+              file_path: filePath,
+              author_name: activeReportData?.metrics?.last_author || 'an ancient author',
+              message: userMsg,
+              history: activeChatHistory,
+            }),
+          });
+
+          const chatData = await resp.json();
+          const reply = chatData.reply || 'The spirit grows faint...';
+          activeChatHistory.push({ role: 'ghost', content: reply });
+
+          if (chatTag && chatData.model_used) {
+            chatTag.textContent = chatData.model_used;
+          }
+
+          pendingBubble.innerHTML = `<span class="bubble-speaker">GHOST:</span> `;
+          Terminal.typewriter(pendingBubble, reply, 16);
+          SoundFX.playChannelingChime();
+        } catch (err) {
+          pendingBubble.innerHTML = `<span class="bubble-speaker">GHOST:</span> <span class="text-dead">The spirit connection was severed: ${err.message}</span>`;
+        }
+      };
+    }
+
   } catch (err) {
     monologueElem.innerHTML = `<span class="text-dead">Failed to commune with spirit: ${err.message}</span>`;
   }
+}
+
+async function responseError(res) {
+  try {
+    const err = await res.json();
+    return err.detail || 'Channeling interrupted';
+  } catch {
+    return 'Channeling interrupted';
+  }
+}
+
+function appendChatBubble(streamElem, role, text) {
+  const bubble = document.createElement('div');
+  bubble.className = `chat-bubble bubble-${role}`;
+  if (role === 'user') {
+    bubble.innerHTML = `<span class="bubble-speaker">YOU:</span> ${escapeHtml(text)}`;
+  } else {
+    bubble.innerHTML = `<span class="bubble-speaker">GHOST:</span> ${escapeHtml(text)}`;
+  }
+  streamElem.appendChild(bubble);
+  streamElem.scrollTop = streamElem.scrollHeight;
+  return bubble;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }

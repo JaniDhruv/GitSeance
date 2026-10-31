@@ -206,6 +206,109 @@ Example style: "This codebase harbors 7 restless spirits — 3 files haven't bee
             sentry_sdk.capture_exception(e)
             return fallback_summary
 
+    @sentry_sdk.trace
+    async def chat_with_ghost(
+        self,
+        file_path: str,
+        author_name: str,
+        message: str,
+        history: list[dict],
+        file_content: str = "",
+    ) -> tuple[str, str]:
+        """
+        Hold a conversational séance with the ghost of a developer.
+        Returns (reply_text, model_used).
+        """
+        author = author_name if author_name and author_name != "unknown" else "an ancient contributor"
+
+        if not self.client:
+            return self._fallback_chat(author, file_path, message), "forensic-engine"
+
+        # Build context from previous conversation
+        history_formatted = ""
+        for h in history[-6:]:
+            role_label = "Developer" if h.get("role") == "user" else f"Ghost of {author}"
+            history_formatted += f"{role_label}: {h.get('content', '')}\n"
+
+        code_snippet_block = f"CODE SNIPPET:\n```\n{file_content[:1500]}\n```\n" if file_content else ""
+
+        prompt = f"""You are the ghost of developer {author}, haunting the file `{file_path}`.
+You are being spoken to in a live séance by a living developer attempting to understand or modernize your code.
+
+FILE UNDER DISCUSSION: {file_path}
+{code_snippet_block}
+CONVERSATION SO FAR:
+{history_formatted}
+
+LIVING DEVELOPER'S QUESTION:
+"{message}"
+
+Respond directly to the developer in 2-4 sentences.
+Stay in character: slightly eerie, wistful, technically grounded, honest about old constraints or hacks, and helpful with modern advice. Keep it punchy!"""
+
+        try:
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=self.SEANCE_SYSTEM_PROMPT,
+                    temperature=0.85,
+                    max_output_tokens=300,
+                ),
+            )
+            text = self._extract_text(response)
+            if text:
+                return text, "gemma-4-26b-a4b-it"
+
+            # Fallback to flash if needed
+            response = self.client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=self.SEANCE_SYSTEM_PROMPT,
+                    temperature=0.85,
+                    max_output_tokens=300,
+                ),
+            )
+            text = self._extract_text(response)
+            if text:
+                return text, "gemini-2.5-flash"
+
+            return self._fallback_chat(author, file_path, message), "forensic-engine"
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
+            return self._fallback_chat(author, file_path, message), "forensic-engine"
+
+    @staticmethod
+    def _fallback_chat(author: str, file_path: str, message: str) -> str:
+        """Deterministic in-character replies when API is unreachable or rate limited."""
+        msg_lower = message.lower()
+        if "why" in msg_lower or "reason" in msg_lower:
+            return (
+                f"Ah, you ask why I wrote it like this in `{file_path}`... In those days, we were racing against the clock. "
+                "The libraries you take for granted in 2026 didn't exist, and memory was scarce. It was the best compromise I could conjure."
+            )
+        elif "hack" in msg_lower or "bug" in msg_lower or "error" in msg_lower:
+            return (
+                f"You noticed the scar, did you? Yes, I left that hack in `{file_path}` at 2 AM before a release. "
+                "I promised myself I would refactor it that weekend... but that weekend never came. Please, bury it for me."
+            )
+        elif "rewrite" in msg_lower or "replace" in msg_lower or "modern" in msg_lower:
+            return (
+                f"If you are brave enough to resurrect `{file_path}`, do not copy my patterns. "
+                "Break the monolithic routines, add strict type annotations, and write automated tests so my spirit may finally rest."
+            )
+        elif "who" in msg_lower or "name" in msg_lower:
+            return (
+                f"I am {author}. My fingerprints are still all over the git blame log of `{file_path}`. "
+                "Though my commits stopped years ago, my logic still executes in the quiet corners of your memory."
+            )
+        else:
+            return (
+                f"The static in the spirit realm is thick, but I hear your curiosity about `{file_path}`. "
+                "Treat this code with respect, living one — every line was written with sweat and late-night coffee."
+            )
+
     @staticmethod
     def _fallback_channeling(file_path: str, last_author: str, last_date: str, last_message: str) -> dict:
         """Fallback channeling when Google API key is not configured."""

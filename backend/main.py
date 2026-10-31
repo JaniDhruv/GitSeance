@@ -76,7 +76,7 @@ app.include_router(tts.router)
 
 
 # ──────────────────────────────────────────────
-# Health Check
+# Health Check & Direct Badge Alias
 # ──────────────────────────────────────────────
 @app.get("/health", response_model=HealthResponse)
 @app.get("/api/health", response_model=HealthResponse)
@@ -88,10 +88,16 @@ async def health_check():
     )
 
 
+@app.get("/api/badge/{owner}/{repo}.svg")
+@app.get("/api/badge/{owner}/{repo}")
+async def badge_alias(owner: str, repo: str):
+    """Direct badge alias for easy README embedding."""
+    return await seance.get_mortality_badge(owner, repo)
+
+
 # ──────────────────────────────────────────────
 # Static Files (Frontend)
 # ──────────────────────────────────────────────
 frontend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
 if os.path.isdir(frontend_path):
     app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
-

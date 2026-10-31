@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GitSéance — Open-Source AI Code Necromancer & Mortality Predictor</title>
-  <meta name="description" content="Channel the ghosts of abandoned GitHub code and predict repository mortality with TabPFN 3.5, Gemma 3, and ElevenLabs.">
+  <meta name="description" content="Channel the ghosts of abandoned GitHub code and predict repository mortality with TabPFN 3.5, Gemma, and ElevenLabs.">
   <link rel="icon" type="image/svg+xml" href="/assets/ghost.svg">
   
   <!-- Fonts & Stylesheets -->
@@ -55,9 +55,9 @@
           <span class="dot"></span>
           <span>📊 ORACLE: TABPFN-3.5 LINKED</span>
         </div>
-        <div class="telemetry-pill active" title="Google Gemma 3 open-weight spirit channeler">
+        <div class="telemetry-pill active" title="Google Gemma open-weight spirit channeler">
           <span class="dot"></span>
-          <span>🔮 MEDIUM: GEMMA-3 TUNED</span>
+          <span>🔮 MEDIUM: GEMMA TUNED</span>
         </div>
         <div class="telemetry-pill active" title="ElevenLabs Neural Ghost Voice synthesizer">
           <span class="dot"></span>
@@ -124,7 +124,7 @@
       <div class="prophecy-banner">
         <div class="prophecy-icon">🔮</div>
         <div class="prophecy-content">
-          <div class="prophecy-label">GEMMA 3'S CODE PROPHECY:</div>
+          <div class="prophecy-label">GEMMA'S CODE PROPHECY:</div>
           <div id="prophecy-text" class="prophecy-text">"The spirits stir..."</div>
         </div>
       </div>
@@ -182,6 +182,9 @@
             <option value="age">Sort: Oldest Last Touched</option>
             <option value="commits">Sort: Most Commits</option>
           </select>
+          <button type="button" id="embed-badge-btn" class="ctrl-btn" title="Get dynamic GitHub SVG badge Markdown">
+            🛡️ Badge
+          </button>
           <button type="button" id="export-markdown-btn" class="ctrl-btn" title="Export entire séance autopsy as Markdown">
             📄 Export MD
           </button>
@@ -218,7 +221,7 @@
         <!-- Ghost Monologue Card -->
         <div class="ghost-monologue-card">
           <div class="ghost-voice-tag">
-            <span>👻</span> CHANNELED GHOST TRANSMISSION (GEMMA 3)
+            <span>👻</span> CHANNELED GHOST TRANSMISSION (GEMMA)
           </div>
           <div id="chamber-monologue" class="typewriter-text">
             The spirits are stirring...
@@ -258,6 +261,34 @@
 
         </div>
 
+        <!-- Conversational Séance Deck (Interactive Ghost Chat) -->
+        <div class="ghost-chat-card">
+          <div class="chat-header-bar">
+            <div class="chat-title">
+              <span>💬</span> COMMUNE DEEPER (SPEAK WITH THE GHOST)
+            </div>
+            <span id="chat-model-badge" class="chat-tag">Gemma 4 Channeled</span>
+          </div>
+          <div id="ghost-chat-stream" class="chat-stream">
+            <div class="chat-bubble bubble-ghost">
+              <span class="bubble-speaker">GHOST:</span> I linger in this file. Speak your questions, living one. Why does my code trouble you?
+            </div>
+          </div>
+          <form id="ghost-chat-form" class="chat-input-form">
+            <span class="chat-prompt">ask &gt;</span>
+            <input 
+              type="text" 
+              id="ghost-chat-input" 
+              class="chat-input" 
+              placeholder="Ask the ghost: Why did you write this hack? How do I refactor it?" 
+              autocomplete="off"
+            >
+            <button type="submit" id="ghost-chat-btn" class="chat-send-btn">
+              <span>SEND</span>
+            </button>
+          </form>
+        </div>
+
         <!-- Revival Blueprint (Patch & Migration) -->
         <div class="revival-blueprint-card">
           <div class="blueprint-header">
@@ -267,9 +298,27 @@
 
           <ol id="chamber-steps" class="migration-steps-list"></ol>
 
-          <button id="copy-patch-btn" class="commune-btn" style="background: var(--terminal-elevated);">
-            <span>📋 Copy Revival Blueprint</span>
-          </button>
+          <div class="blueprint-actions">
+            <button id="copy-patch-btn" class="commune-btn" style="background: var(--terminal-elevated);">
+              <span>📋 Copy Revival Blueprint</span>
+            </button>
+            <button id="print-autopsy-btn" class="commune-btn" style="background: var(--terminal-elevated);">
+              <span>🪦 Print Death Certificate</span>
+            </button>
+          </div>
+
+          <!-- Expandable ASCII Death Certificate Drawer -->
+          <div id="autopsy-drawer" class="autopsy-drawer" style="display: none;">
+            <div class="autopsy-drawer-header">
+              <span>📜 OFFICIAL POST-MORTEM AUTOPSY CERTIFICATE</span>
+              <button id="close-autopsy-btn" class="chamber-close" style="font-size: 14px;">✕</button>
+            </div>
+            <pre id="autopsy-pre" class="autopsy-pre"></pre>
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+              <button id="copy-autopsy-btn" class="ctrl-btn">📋 Copy Certificate</button>
+              <button id="download-autopsy-btn" class="ctrl-btn">💾 Download .TXT</button>
+            </div>
+          </div>
         </div>
 
         <!-- SerpApi Real-Time Replacement Intelligence -->

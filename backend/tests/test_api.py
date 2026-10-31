@@ -49,3 +49,29 @@ def test_seance_stream_demo_repo():
     content = response.text
     assert "data:" in content
     assert "reaper" in content
+
+
+def test_seance_chat_endpoint():
+    response = client.post(
+        "/api/seance/chat",
+        json={
+            "repo_url": "https://github.com/mitsuhiko/flask-cache",
+            "file_path": "flask_cache/__init__.py",
+            "author_name": "Armin Ronacher",
+            "message": "Why did you write this file?",
+            "history": [],
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "reply" in data
+    assert len(data["reply"]) > 0
+    assert "model_used" in data
+
+
+def test_badge_endpoint():
+    response = client.get("/api/badge/mitsuhiko/flask-cache.svg")
+    assert response.status_code == 200
+    assert "image/svg+xml" in response.headers.get("content-type", "")
+    assert "<svg" in response.text
+    assert "GitSéance" in response.text
