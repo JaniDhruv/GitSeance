@@ -92,14 +92,64 @@ async function executeSeance(repoUrl) {
   Terminal.triggerFlicker();
   SoundFX.playSummonSweep();
 
-  // Simulated telemetry sequence while request runs
-  Terminal.log('reaper', `Connecting to GitHub endpoint for: ${repoUrl}...`);
-  setTimeout(() => Terminal.log('reaper', 'Traversing git commit trees and blame history...'), 600);
-  setTimeout(() => Terminal.log('oracle', 'Synthesizing tabular git metrics for TabPFN-3.5 classification...'), 1200);
-  setTimeout(() => Terminal.log('oracle', 'Running TabPFN inference on code mortality risk...'), 1800);
-  setTimeout(() => Terminal.log('medium', 'Gemma 3 listening for whispers in commit messages...'), 2400);
+  function onComplete(data) {
+    currentSeanceData = data;
+    renderSeanceResults(data);
+    if (resultsContainer) {
+      resultsContainer.style.display = 'block';
+      resultsContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<span>🔮 INITIATE SÉANCE</span>`;
+    }
+  }
 
+  function onError(msg) {
+    Terminal.log('error', `Séance disrupted: ${msg}`);
+    alert(`The séance was disrupted: ${msg}`);
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<span>🔮 INITIATE SÉANCE</span>`;
+    }
+  }
+
+  // Use real-time Server-Sent Events (SSE) streaming if available
+  if (window.EventSource) {
+    const streamUrl = `/api/seance/stream?repo_url=${encodeURIComponent(repoUrl)}`;
+    const eventSource = new EventSource(streamUrl);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data);
+        if (payload.agent === 'error') {
+          eventSource.close();
+          onError(payload.message);
+        } else if (payload.agent === 'complete') {
+          eventSource.close();
+          Terminal.log('medium', payload.message);
+          onComplete(payload.result);
+        } else {
+          Terminal.log(payload.agent, payload.message);
+        }
+      } catch (err) {
+        console.error('SSE parse error:', err);
+      }
+    };
+
+    eventSource.onerror = (err) => {
+      eventSource.close();
+      console.warn('SSE disconnected, falling back to direct POST /api/seance/scan', err);
+      fallbackPostSeance(repoUrl, onComplete, onError);
+    };
+  } else {
+    fallbackPostSeance(repoUrl, onComplete, onError);
+  }
+}
+
+async function fallbackPostSeance(repoUrl, onComplete, onError) {
   try {
+    Terminal.log('reaper', `Contacting repository archives for ${repoUrl}...`);
     const response = await fetch('/api/seance/scan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -112,23 +162,10 @@ async function executeSeance(repoUrl) {
     }
 
     const data = await response.json();
-    currentSeanceData = data;
-
-    Terminal.log('medium', `Séance complete. Channeled ${data.total_files_scanned} files from the other side.`);
-    renderSeanceResults(data);
-
-    if (resultsContainer) {
-      resultsContainer.style.display = 'block';
-      resultsContainer.scrollIntoView({ behavior: 'smooth' });
-    }
-  } catch (error) {
-    Terminal.log('error', `Séance disrupted: ${error.message}`);
-    alert(`The séance was disrupted: ${error.message}`);
-  } finally {
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = `<span>🔮 INITIATE SÉANCE</span>`;
-    }
+    Terminal.log('medium', `Séance complete. Channeled ${data.total_files_scanned} files.`);
+    onComplete(data);
+  } catch (err) {
+    onError(err.message);
   }
 }
 
@@ -185,6 +222,69 @@ function setupToolbarListeners() {
       renderFileRoster();
     });
   }
+
+  // Export buttons
+  const mdBtn = document.getElementById('export-markdown-btn');
+  if (mdBtn) {
+    mdBtn.addEventListener('click', () => {
+      SoundFX.playKeyClick();
+      exportMarkdownReport();
+    });
+  }
+
+  const jsonBtn = document.getElementById('export-json-btn');
+  if (jsonBtn) {
+    jsonBtn.addEventListener('click', () => {
+      SoundFX.playKeyClick();
+      exportJsonReport();
+    });
+  }
+}
+
+function exportMarkdownReport() {
+  if (!currentSeanceData) return;
+  const d = currentSeanceData;
+  let md = `# 🔮 GitSéance Haunting Dossier: ${d.repo_name}\n\n`;
+  md += `> Repository: ${d.repo_url}\n`;
+  md += `> Prophecy: "${d.summary}"\n\n`;
+  md += `## 📊 Graveyard Tally\n\n`;
+  md += `- **Total Files Scanned:** ${d.total_files_scanned}\n`;
+  md += `- **💀 Clinically Dead:** ${d.dead_count}\n`;
+  md += `- **👻 Haunted:** ${d.haunted_count}\n`;
+  md += `- **🪦 Orphaned:** ${d.orphaned_count}\n`;
+  md += `- **☠️ Cursed:** ${d.cursed_count}\n`;
+  md += `- **✨ Active / Fading:** ${d.alive_count}\n\n`;
+  md += `## 📜 File Necropsy Ledger\n\n`;
+  md += `| File Path | Status | TabPFN Mortality | Days Inactive | Commits | Top Warnings |\n`;
+  md += `|---|---|---|---|---|---|\n`;
+
+  d.haunting_reports.forEach((r) => {
+    const risk = r.mortality_risk !== null ? `${Math.round(r.mortality_risk * 100)}%` : `${Math.round(r.ghost_score * 100)}%`;
+    const warn = r.warnings.slice(0, 2).join('; ') || 'None';
+    md += `| \`${r.file_path}\` | **${r.status.toUpperCase()}** | ${risk} | ${r.metrics.days_since_last_commit}d | ${r.metrics.total_commits} | ${warn} |\n`;
+  });
+
+  md += `\n---\n*Generated by GitSéance — AI Code Necromancer & TabPFN Mortality Predictor*\n`;
+
+  downloadBlob(md, `gitseance-${d.repo_name}-autopsy.md`, 'text/markdown');
+}
+
+function exportJsonReport() {
+  if (!currentSeanceData) return;
+  const jsonStr = JSON.stringify(currentSeanceData, null, 2);
+  downloadBlob(jsonStr, `gitseance-${currentSeanceData.repo_name}-ledger.json`, 'application/json');
+}
+
+function downloadBlob(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 function renderFileRoster() {

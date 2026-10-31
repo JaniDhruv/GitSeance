@@ -75,6 +75,7 @@ app.include_router(tts.router)
 # ──────────────────────────────────────────────
 # Health Check
 # ──────────────────────────────────────────────
+@app.get("/health", response_model=HealthResponse)
 @app.get("/api/health", response_model=HealthResponse)
 async def health_check():
     """Health check endpoint."""

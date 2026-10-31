@@ -155,3 +155,79 @@ async def channel_ghost(request: ChannelRequest):
                 status_code=500,
                 detail=f"The channeling was disrupted: {str(e)}"
             )
+
+
+@router.get("/stream")
+async def stream_seance(repo_url: str):
+    """
+    Stream live séance progress via Server-Sent Events (SSE).
+    Sends real-time telemetry from Reaper, Oracle, and Gemma agents as the ritual unfolds.
+    """
+
+    async def event_generator():
+        try:
+            msg = json.dumps({"agent": "reaper", "message": f"Summoning repository spirits for {repo_url}..."})
+            yield f"data: {msg}\n\n"
+            await asyncio.sleep(0.05)
+
+            # Step 1: Reaper
+            msg = json.dumps({"agent": "reaper", "message": "Traversing git commit trees and blame history..."})
+            yield f"data: {msg}\n\n"
+            reports = await reaper.scan_repository(repo_url)
+            msg = json.dumps({"agent": "reaper", "message": f"Reaper cataloged {len(reports)} files from the codebase graveyard."})
+            yield f"data: {msg}\n\n"
+            await asyncio.sleep(0.05)
+
+            # Step 2: Oracle
+            msg = json.dumps({"agent": "oracle", "message": "Synthesizing 7-dimensional feature vectors for TabPFN-3.5..."})
+            yield f"data: {msg}\n\n"
+            reports = await oracle.predict_mortality(reports)
+            msg = json.dumps({"agent": "oracle", "message": "TabPFN Bayesian code mortality calculation complete."})
+            yield f"data: {msg}\n\n"
+            await asyncio.sleep(0.05)
+
+            # Step 3: Medium Summary
+            msg = json.dumps({"agent": "medium", "message": "Consulting Google Gemma 3 for the séance prophecy..."})
+            yield f"data: {msg}\n\n"
+            haunting_data = "\n".join(
+                f"- {r.file_path}: status={r.status.value}, ghost_score={r.ghost_score}, mortality_risk={r.mortality_risk}"
+                for r in reports[:20]
+            )
+            from services.github_client import GitHubClient
+            owner, repo_name = GitHubClient.parse_repo_url(repo_url)
+            summary = await gemma.generate_summary(repo_name=repo_name, haunting_data=haunting_data)
+
+            status_counts = {s: 0 for s in HauntingStatus}
+            for r in reports:
+                status_counts[r.status] += 1
+
+            response_data = SeanceResponse(
+                repo_name=repo_name,
+                repo_url=repo_url,
+                total_files_scanned=len(reports),
+                dead_count=status_counts[HauntingStatus.DEAD],
+                haunted_count=status_counts[HauntingStatus.HAUNTED],
+                orphaned_count=status_counts[HauntingStatus.ORPHANED],
+                cursed_count=status_counts[HauntingStatus.CURSED],
+                alive_count=status_counts[HauntingStatus.ALIVE] + status_counts[HauntingStatus.FADING],
+                haunting_reports=reports,
+                summary=summary,
+            )
+
+            msg = json.dumps({"agent": "complete", "message": "The veil is parted. The séance is complete.", "result": response_data.model_dump()})
+            yield f"data: {msg}\n\n"
+
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
+            msg = json.dumps({"agent": "error", "message": f"The séance was disrupted: {str(e)}"})
+            yield f"data: {msg}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )

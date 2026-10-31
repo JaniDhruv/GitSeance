@@ -192,10 +192,37 @@ const GhostVoicePlayer = (function () {
 
         await audio.play();
       } catch (err) {
-        console.warn('TTS error:', err);
-        if (btnElement) {
-          btnElement.disabled = false;
-          btnElement.innerHTML = `<span>⚠️ Voice Unavailable</span>`;
+        console.warn('ElevenLabs TTS unavailable, falling back to Web Speech API:', err);
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.pitch = (voice === 'roger' || voice === 'charlie') ? 0.6 : 0.85;
+          utterance.rate = 0.88;
+
+          utterance.onstart = () => {
+            if (btnElement) {
+              btnElement.disabled = false;
+              btnElement.innerHTML = `<span>⏹ Stop Voice (Ethereal)</span>`;
+            }
+          };
+          utterance.onend = () => {
+            if (btnElement) {
+              btnElement.disabled = false;
+              btnElement.innerHTML = `<span>🔊 Channel Ghost Voice</span>`;
+            }
+          };
+          utterance.onerror = () => {
+            if (btnElement) {
+              btnElement.disabled = false;
+              btnElement.innerHTML = `<span>🔊 Channel Ghost Voice</span>`;
+            }
+          };
+          window.speechSynthesis.speak(utterance);
+        } else {
+          if (btnElement) {
+            btnElement.disabled = false;
+            btnElement.innerHTML = `<span>⚠️ Voice Unavailable</span>`;
+          }
         }
       }
     },
@@ -204,6 +231,9 @@ const GhostVoicePlayer = (function () {
       if (currentAudio) {
         currentAudio.pause();
         currentAudio = null;
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
       }
       if (visualizerId) cancelAnimationFrame(visualizerId);
     },
