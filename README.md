@@ -96,17 +96,34 @@ Built for **Hacktoberfest Open-Source AI Challenge: Week 4 ("Ghost in the Machin
 
 ---
 
+## 🤖 GitHub Copilot & AI-Assisted Necromancy
+
+GitSéance is deeply integrated with **GitHub Copilot** to empower developers with AI-assisted code revival directly inside their IDE:
+
+- **Repository Custom Instructions (`.github/copilot-instructions.md`)**:
+  - Teaches GitHub Copilot the complete 4-agent necromancy architecture, the 7-dimensional TabPFN tabular schema, zero-crash fallback rules, and Pydantic validation models.
+- **Reusable Copilot Prompt Templates (`.github/prompts/`)**:
+  - **`/resurrect-file`** (`.github/prompts/resurrect-file.prompt.md`): Channels the spirit of departed authors to explain past constraints and generate a modernized 2026 refactoring blueprint.
+  - **`/tabpfn-mortality`** (`.github/prompts/tabpfn-mortality.prompt.md`): Evaluates 7-dimensional git telemetry metrics to calculate code mortality and abandonment probability using Prior Labs TabPFN-3.5 foundation model patterns.
+  - **`/dep-modernize`** (`.github/prompts/dep-modernize.prompt.md`): Audits deprecated dependencies from `requirements.txt` or `package.json` to surface 2026 replacements and active CVE advisories.
+- **Standardized Review Checklist (`.github/pull_request_template.md`)**:
+  - Enforces agent decoupling, TabPFN metric integrity, and offline fallback resilience on every pull request.
+- **Automated Multi-OS CI Workflows (`.github/workflows/ci.yml`)**:
+  - Continuous Integration pipeline testing across Ubuntu and Windows on Python 3.11 and 3.12.
+
+---
+
 ## 🛠️ Technology Integration Matrix
 
 | Partner / Tool | Role in GitSéance |
 |---|---|
+| **GitHub Copilot** | Custom repository instructions (`.github/copilot-instructions.md`) & reusable prompt templates (`.github/prompts/`) |
 | **TabPFN 3.5** | Bayesian tabular neural network predicting file abandonment risk |
 | **Gemma 3** | Open-weight LLM channeling developer ghosts & revival blueprints |
 | **ElevenLabs** | Neural voice text-to-speech for audible ghost channeling |
 | **SerpApi** | Live search grounding for 2026 library replacements & CVE lookups |
-| **Sentry** | Distributed tracing and AI Agent transaction monitoring |
+| **FastAPI** | High-performance asynchronous Python backend with live SSE streaming |
 | **Render** | Dockerized cloud container deployment |
-| **FastAPI** | High-performance asynchronous Python backend |
 
 ---
 
