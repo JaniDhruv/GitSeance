@@ -38,7 +38,7 @@ Keep responses vivid, personal, and under 300 words. You're telling a ghost stor
             self.client = genai.Client(api_key=self.api_key)
         else:
             self.client = None
-        self.model = "gemma-3-27b-it"
+        self.model = "gemini-2.5-flash"
 
     @sentry_sdk.trace
     async def channel_ghost(
@@ -97,27 +97,37 @@ Format your response EXACTLY as:
 ---EFFORT_ESTIMATE---
 (one word)"""
 
-        response = self.client.models.generate_content(
-            model=self.model,
-            contents=user_prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=self.SEANCE_SYSTEM_PROMPT,
-                temperature=0.85,
-                max_output_tokens=1500,
-            ),
-        )
-
-        return self._parse_channeling(response.text)
+        try:
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=self.SEANCE_SYSTEM_PROMPT,
+                    temperature=0.85,
+                    max_output_tokens=1500,
+                ),
+            )
+            return self._parse_channeling(response.text)
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
+            return self._fallback_channeling(
+                file_path=file_path,
+                last_author=last_author,
+                last_date=last_date,
+                last_message=last_message,
+            )
 
     @sentry_sdk.trace
     async def generate_summary(self, repo_name: str, haunting_data: str) -> str:
         """Generate a one-line séance summary for the whole repo."""
 
+        fallback_summary = (
+            f"The spirits of {repo_name} have answered the summons: ancient logic rests in its commits, "
+            f"waiting for modern hands to break the seal."
+        )
+
         if not self.client:
-            return (
-                f"The spirits of {repo_name} have answered the summons: ancient logic rests in its commits, "
-                f"waiting for modern hands to break the seal."
-            )
+            return fallback_summary
 
         prompt = f"""You are a code necromancer who just completed a séance on the repository "{repo_name}".
 
@@ -130,17 +140,20 @@ Be specific — mention actual numbers or file names if possible.
 Example style: "This codebase harbors 7 restless spirits — 3 files haven't been touched since 2019, and the ghost of jQuery still whispers in the shadows of utils.js."
 """
 
-        response = self.client.models.generate_content(
-            model=self.model,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                system_instruction="You are a dramatic code necromancer. One sentence only.",
-                temperature=0.9,
-                max_output_tokens=200,
-            ),
-        )
-
-        return response.text.strip()
+        try:
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction="You are a dramatic code necromancer. One sentence only.",
+                    temperature=0.9,
+                    max_output_tokens=200,
+                ),
+            )
+            return response.text.strip()
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
+            return fallback_summary
 
     @staticmethod
     def _fallback_channeling(file_path: str, last_author: str, last_date: str, last_message: str) -> dict:

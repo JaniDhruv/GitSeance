@@ -41,6 +41,7 @@ def test_parse_package_json():
 def test_curated_replacements_fallback():
     async def _test():
         client = SerpApiClient()
+        client.api_key = ""  # Verify fallback dictionary when no API key
         results = await client.search_replacement("flask-cache")
         assert len(results) > 0
         assert results[0]["new_package"] == "Flask-Caching"

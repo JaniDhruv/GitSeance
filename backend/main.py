@@ -18,21 +18,24 @@ from models.schemas import HealthResponse
 
 
 # ──────────────────────────────────────────────
-# Sentry AI Agent Tracing Setup
+# Sentry AI Agent Tracing Setup (Optional)
 # ──────────────────────────────────────────────
 settings = get_settings()
 
-if settings.sentry_dsn:
-    sentry_sdk.init(
-        dsn=settings.sentry_dsn,
-        traces_sample_rate=1.0,
-        profiles_sample_rate=1.0,
-        send_default_pii=False,
-        environment=settings.app_env,
-        _experiments={
-            "enable_ai_monitoring": True,
-        },
-    )
+if settings.sentry_dsn and settings.sentry_dsn.startswith("http"):
+    try:
+        sentry_sdk.init(
+            dsn=settings.sentry_dsn,
+            traces_sample_rate=1.0,
+            profiles_sample_rate=1.0,
+            send_default_pii=False,
+            environment=settings.app_env,
+            _experiments={
+                "enable_ai_monitoring": True,
+            },
+        )
+    except Exception:
+        pass
 
 
 # ──────────────────────────────────────────────
