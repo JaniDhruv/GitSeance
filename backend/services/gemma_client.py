@@ -1,6 +1,6 @@
 """
 Gemma Client — Google AI Studio API for the Medium agent's ghost channeling.
-Uses the google-genai SDK for Gemma 3 open-weight model.
+Uses the google-genai SDK for the Gemma open-weight model on Google AI Studio.
 """
 
 import sentry_sdk
@@ -38,7 +38,26 @@ Keep responses vivid, personal, and under 300 words. You're telling a ghost stor
             self.client = genai.Client(api_key=self.api_key)
         else:
             self.client = None
-        self.model = "gemini-2.5-flash"
+        self.model = "gemma-4-26b-a4b-it"
+
+    @staticmethod
+    def _extract_text(response) -> str:
+        """Extract content text from Google GenAI response, filtering thought tokens if present."""
+        if not response:
+            return ""
+        if hasattr(response, "text") and response.text:
+            return response.text.strip()
+        if hasattr(response, "candidates") and response.candidates:
+            candidate = response.candidates[0]
+            if hasattr(candidate, "content") and hasattr(candidate.content, "parts"):
+                parts = candidate.content.parts
+                actual_parts = [
+                    p.text for p in parts
+                    if not getattr(p, "thought", False) and getattr(p, "text", None)
+                ]
+                if actual_parts:
+                    return "".join(actual_parts).strip()
+        return ""
 
     @sentry_sdk.trace
     async def channel_ghost(
@@ -107,7 +126,25 @@ Format your response EXACTLY as:
                     max_output_tokens=1500,
                 ),
             )
-            return self._parse_channeling(response.text)
+            text = self._extract_text(response)
+            if not text:
+                # Fallback to gemini-2.5-flash if gemma returns empty
+                response = self.client.models.generate_content(
+                    model="gemini-2.5-flash",
+                    contents=user_prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=self.SEANCE_SYSTEM_PROMPT,
+                        temperature=0.85,
+                        max_output_tokens=1500,
+                    ),
+                )
+                text = self._extract_text(response)
+            return self._parse_channeling(text) if text else self._fallback_channeling(
+                file_path=file_path,
+                last_author=last_author,
+                last_date=last_date,
+                last_message=last_message,
+            )
         except Exception as e:
             sentry_sdk.capture_exception(e)
             return self._fallback_channeling(
@@ -150,7 +187,21 @@ Example style: "This codebase harbors 7 restless spirits — 3 files haven't bee
                     max_output_tokens=200,
                 ),
             )
-            return response.text.strip()
+            text = self._extract_text(response)
+            if text:
+                return text
+            # Fallback to flash if gemma returns empty
+            response = self.client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction="You are a dramatic code necromancer. One sentence only.",
+                    temperature=0.9,
+                    max_output_tokens=200,
+                ),
+            )
+            text = self._extract_text(response)
+            return text if text else fallback_summary
         except Exception as e:
             sentry_sdk.capture_exception(e)
             return fallback_summary
