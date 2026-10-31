@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitSéance — Open-Source AI Code Necromancer & Mortality Predictor</title>
+  <meta name="description" content="Channel the ghosts of abandoned GitHub code and predict repository mortality with TabPFN 3.5, Gemma 3, and ElevenLabs.">
+  <link rel="icon" type="image/svg+xml" href="/assets/ghost.svg">
+  
+  <!-- Fonts & Stylesheets -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/terminal.css">
+  <link rel="stylesheet" href="/css/animations.css">
+</head>
+<body>
+
+  <!-- Background Ghost Particle Canvas -->
+  <canvas id="ghost-canvas"></canvas>
+
+  <!-- CRT Simulation Filters -->
+  <div class="crt-overlay" aria-hidden="true"></div>
+  <div class="crt-vignette" aria-hidden="true"></div>
+
+  <!-- Main Terminal Application Container -->
+  <main class="app-container">
+
+    <!-- Top Terminal Header & Mission HUD -->
+    <header class="terminal-header">
+      <div class="header-top">
+        <div class="brand-section">
+          <img src="/assets/ghost.svg" alt="GitSéance Ghost" class="ghost-logo">
+          <div>
+            <h1 class="brand-title glitch-text" data-text="GIT SÉANCE">GIT SÉANCE</h1>
+            <p class="brand-tagline">EVERY CODEBASE HAS GHOSTS. WE CHANNEL THEM.</p>
+          </div>
+        </div>
+
+        <div class="header-controls">
+          <button id="crt-toggle-btn" class="ctrl-btn active" title="Toggle retro CRT scanlines and flicker">
+            📺 CRT: ON
+          </button>
+          <button id="sound-toggle-btn" class="ctrl-btn active" title="Toggle retro synthesized keystrokes & audio">
+            🔊 AUDIO: ON
+          </button>
+        </div>
+      </div>
+
+      <!-- Agent Telemetry HUD Strip -->
+      <div class="agent-telemetry-strip">
+        <div class="telemetry-pill active" title="AST traversal & git history scanner">
+          <span class="dot"></span>
+          <span>💀 REAPER: ARMED</span>
+        </div>
+        <div class="telemetry-pill active" title="Prior Labs TabPFN-3.5 Bayesian code mortality predictor">
+          <span class="dot"></span>
+          <span>📊 ORACLE: TABPFN-3.5 LINKED</span>
+        </div>
+        <div class="telemetry-pill active" title="Google Gemma 3 open-weight spirit channeler">
+          <span class="dot"></span>
+          <span>🔮 MEDIUM: GEMMA-3 TUNED</span>
+        </div>
+        <div class="telemetry-pill active" title="ElevenLabs Neural Ghost Voice synthesizer">
+          <span class="dot"></span>
+          <span>🔊 VOICE: ELEVENLABS SYNCED</span>
+        </div>
+        <div class="telemetry-pill active" title="SerpApi real-time replacement search">
+          <span class="dot"></span>
+          <span>🔍 SEARCH: SERPAPI ACTIVE</span>
+        </div>
+        <div class="telemetry-pill active" title="Sentry AI Agent Tracing enabled">
+          <span class="dot"></span>
+          <span>🛡️ SENTRY: TRACED</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- The Séance Altar (Input Section) -->
+    <section class="altar-card">
+      <h2 class="altar-headline">
+        <span>🕯️</span> THE SÉANCE ALTAR
+      </h2>
+      <p class="altar-subtext">
+        Summon the spirits trapped inside any GitHub repository. The Reaper scans commit blames, TabPFN predicts impending file mortality, and Gemma channels the voices of departed authors.
+      </p>
+
+      <form id="summon-form" class="summon-form">
+        <div class="prompt-prefix">summon &gt;</div>
+        <input 
+          type="url" 
+          id="repo-url-input" 
+          class="summon-input" 
+          placeholder="https://github.com/mitsuhiko/flask-cache" 
+          required 
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <button type="submit" id="summon-btn" class="summon-btn">
+          <span>🔮 INITIATE SÉANCE</span>
+        </button>
+      </form>
+
+      <!-- Quick Preset Graveyards -->
+      <div class="preset-graveyards">
+        <span class="preset-label">Historic Graveyards:</span>
+        <button type="button" class="preset-chip" data-url="https://github.com/mitsuhiko/flask-cache">
+          🐍 flask-cache (Python 2 Fossil)
+        </button>
+        <button type="button" class="preset-chip" data-url="https://github.com/jquery/jquery-color">
+          📜 jquery-color (Historic JS)
+        </button>
+        <button type="button" class="preset-chip" data-url="https://github.com/JaniDhruv/GitSeance">
+          ⚡ GitSeance (This Project)
+        </button>
+      </div>
+    </section>
+
+    <!-- Live Telemetry Console Stream -->
+    <section id="telemetry-console" class="telemetry-console" aria-live="polite"></section>
+
+    <!-- The Haunting Ledger Results (Initially Hidden) -->
+    <section id="seance-results" style="display: none;">
+      
+      <!-- Gemma Prophecy Banner -->
+      <div class="prophecy-banner">
+        <div class="prophecy-icon">🔮</div>
+        <div class="prophecy-content">
+          <div class="prophecy-label">GEMMA 3'S CODE PROPHECY:</div>
+          <div id="prophecy-text" class="prophecy-text">"The spirits stir..."</div>
+        </div>
+      </div>
+
+      <!-- Haunting Summary Counts -->
+      <div class="tally-grid">
+        <div class="tally-card">
+          <span class="tally-title">📁 Total Scanned</span>
+          <span id="tally-total" class="tally-value">0</span>
+        </div>
+        <div class="tally-card tally-dead">
+          <span class="tally-title">💀 Clinically Dead</span>
+          <span id="tally-dead" class="tally-value">0</span>
+        </div>
+        <div class="tally-card tally-haunted">
+          <span class="tally-title">👻 Haunted Code</span>
+          <span id="tally-haunted" class="tally-value">0</span>
+        </div>
+        <div class="tally-card tally-orphaned">
+          <span class="tally-title">🪦 Orphaned Files</span>
+          <span id="tally-orphaned" class="tally-value">0</span>
+        </div>
+        <div class="tally-card tally-cursed">
+          <span class="tally-title">☠️ Cursed Logic</span>
+          <span id="tally-cursed" class="tally-value">0</span>
+        </div>
+        <div class="tally-card tally-alive">
+          <span class="tally-title">✨ Active Spirits</span>
+          <span id="tally-alive" class="tally-value">0</span>
+        </div>
+      </div>
+
+      <!-- Ledger Control Toolbar -->
+      <div class="ledger-toolbar">
+        <div class="filter-pills">
+          <button type="button" class="filter-pill active" data-filter="all">All Files</button>
+          <button type="button" class="filter-pill" data-filter="high_risk">⚠️ High TabPFN Risk (&gt;70%)</button>
+          <button type="button" class="filter-pill" data-filter="dead">💀 Dead</button>
+          <button type="button" class="filter-pill" data-filter="haunted">👻 Haunted</button>
+          <button type="button" class="filter-pill" data-filter="orphaned">🪦 Orphaned</button>
+          <button type="button" class="filter-pill" data-filter="cursed">☠️ Cursed</button>
+        </div>
+
+        <div class="search-and-sort">
+          <input 
+            type="text" 
+            id="roster-search" 
+            class="table-search" 
+            placeholder="🔍 Filter by file path..." 
+            autocomplete="off"
+          >
+          <select id="roster-sort" class="sort-select" aria-label="Sort files">
+            <option value="mortality">Sort: TabPFN Mortality Risk</option>
+            <option value="ghost_score">Sort: Ghost Severity</option>
+            <option value="age">Sort: Oldest Last Touched</option>
+            <option value="commits">Sort: Most Commits</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- File Roster List -->
+      <div id="ledger-roster" class="ledger-roster"></div>
+    </section>
+
+  </main>
+
+  <!-- ════════════════════════════════════════════════
+       THE SÉANCE CHAMBER MODAL
+       ════════════════════════════════════════════════ -->
+  <aside id="seance-modal" class="seance-modal" role="dialog" aria-modal="true">
+    <div class="modal-chamber">
+      
+      <!-- Modal Header -->
+      <div class="chamber-header">
+        <div class="chamber-title-group">
+          <span>🔮</span>
+          <h3 id="chamber-file-title" class="chamber-title">file.py</h3>
+        </div>
+        <button id="chamber-close-btn" class="chamber-close" title="Close Séance Chamber" aria-label="Close modal">✕</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="chamber-body">
+        
+        <!-- Ghost Monologue Card -->
+        <div class="ghost-monologue-card">
+          <div class="ghost-voice-tag">
+            <span>👻</span> CHANNELED GHOST TRANSMISSION (GEMMA 3)
+          </div>
+          <div id="chamber-monologue" class="typewriter-text">
+            The spirits are stirring...
+          </div>
+
+          <!-- ElevenLabs Neural Voice Deck -->
+          <div class="audio-deck">
+            <div class="audio-controls">
+              <label for="voice-select" style="font-size: 11px; color: var(--terminal-muted);">Voice:</label>
+              <select id="voice-select" class="voice-select">
+                <option value="aria">Aria (Spectral Whisper)</option>
+                <option value="roger">Roger (Ancient Architect)</option>
+                <option value="sarah">Sarah (Soft Echo)</option>
+                <option value="laura">Laura (Ethereal Narrator)</option>
+                <option value="charlie">Charlie (Elder Storyteller)</option>
+              </select>
+              <button id="play-voice-btn" class="play-voice-btn">
+                <span>🔊 Channel Ghost Voice</span>
+              </button>
+            </div>
+            <canvas id="waveform-canvas" class="audio-waveform-canvas" width="140" height="28"></canvas>
+          </div>
+        </div>
+
+        <!-- Ghost Context Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+          
+          <div class="tally-card" style="border-left: 3px solid var(--ghost-green);">
+            <div class="tally-title">📜 Why It Was Written</div>
+            <p id="chamber-why" style="font-size: 13px; line-height: 1.5; color: var(--terminal-text);"></p>
+          </div>
+
+          <div class="tally-card" style="border-left: 3px solid var(--haunted-amber);">
+            <div class="tally-title">🕯️ The Ghost's Regret</div>
+            <p id="chamber-wish" style="font-size: 13px; line-height: 1.5; color: var(--terminal-text);"></p>
+          </div>
+
+        </div>
+
+        <!-- Revival Blueprint (Patch & Migration) -->
+        <div class="revival-blueprint-card">
+          <div class="blueprint-header">
+            <h4 class="blueprint-title">✨ REVIVAL BLUEPRINT</h4>
+            <span id="chamber-effort" class="effort-badge">Effort: MODERATE</span>
+          </div>
+
+          <ol id="chamber-steps" class="migration-steps-list"></ol>
+
+          <button id="copy-patch-btn" class="commune-btn" style="background: var(--terminal-elevated);">
+            <span>📋 Copy Revival Blueprint</span>
+          </button>
+        </div>
+
+        <!-- SerpApi Real-Time Replacement Intelligence -->
+        <div class="serp-intelligence-card">
+          <div class="serp-header">
+            <span>🔍</span> 2026 MODERN ECOSYSTEM ALTERNATIVES (SERPAPI)
+          </div>
+          <div id="serp-replacements-list" class="replacement-list"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- Core Scripts -->
+  <script src="/js/ghost.js"></script>
+  <script src="/js/audio.js"></script>
+  <script src="/js/terminal.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

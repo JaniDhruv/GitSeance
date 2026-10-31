@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <filter id="ghost-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <linearGradient id="ghost-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#33ff66" stop-opacity="0.9" />
+      <stop offset="60%" stop-color="#00ff41" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#008f11" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+  <!-- Floating body -->
+  <path d="M 50 15 
+           C 25 15, 20 40, 20 65 
+           C 20 80, 23 85, 28 80
+           C 33 75, 37 75, 42 82
+           C 47 88, 53 88, 58 82
+           C 63 75, 67 75, 72 80
+           C 77 85, 80 80, 80 65
+           C 80 40, 75 15, 50 15 Z" 
+        fill="url(#ghost-grad)" 
+        stroke="#00ff41" 
+        stroke-width="2" 
+        filter="url(#ghost-glow)"/>
+  <!-- Hollow glowing eyes -->
+  <ellipse cx="38" cy="45" rx="5" ry="8" fill="#050505" stroke="#00ff41" stroke-width="1.5" />
+  <ellipse cx="62" cy="45" rx="5" ry="8" fill="#050505" stroke="#00ff41" stroke-width="1.5" />
+  <circle cx="39" cy="43" r="2" fill="#33ff66" />
+  <circle cx="63" cy="43" r="2" fill="#33ff66" />
+  <!-- O-shaped mouth -->
+  <ellipse cx="50" cy="62" rx="4" ry="7" fill="#050505" stroke="#00ff41" stroke-width="1.2" />
+</svg>
